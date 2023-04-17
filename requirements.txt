@@ -1,4 +1,5 @@
 pylint
 autopep8
 django
+django-bootstrap-v5
 python-decouple

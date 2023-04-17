@@ -1,0 +1,35 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>optimuspy</title>
+  {% load bootstrap5 %}
+  {% bootstrap_css %}
+  {% bootstrap_javascript %}
+  <link rel="stylesheet" type="text/css" href="{% static 'css/index.css' %}">
+  <link rel="shortcut icon" type="image/png" href="{%  static 'images/favicon.ico' %}">
+</head>
+
+<div class="lines">
+    <div class="line"></div>
+    <div class="line"></div>
+    <div class="line"></div>
+  </div>
+
+
+<body>
+    <div class="container h-100 justify-content-center align-items-center">
+        <div class="row h-100 justify-content-center align-items-center">
+        <div class="text-center">
+            <img src="{% static 'images/logo.png' %}" alt="optimuspy">
+            <p class="text-white h4 landing">Optimuspy - это сервис тестирования производительности программ на C и C++ для сравнения результатов оптимизаций и разных комбинаций преобразований, проводимых оптимизирующим компилятором.</p>
+            {% comment %} <p class="text-white">Optimuspy is a web service for optimizing and performance testing of C and C++ programs.</p> {% endcomment %}
+            <div class="btn-group" role="group" aria-label="Basic example">
+                <button type="button" class="btn btn-dark btn-lg" href="/login">Войти</button>
+                <button type="button" class="btn btn-light btn-lg" href="/signup">Регистрация</button>
+              </div>
+        </div>
+        </div>
+    </div>
+<body>
