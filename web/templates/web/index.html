@@ -1,30 +1,23 @@
 {% load static %}
-
 <!DOCTYPE html>
 <html>
   <head>
     <title>optimuspy</title>
-    {% load bootstrap5 %} {% bootstrap_css %} {% bootstrap_javascript %}
-    <link
-      rel="stylesheet"
-      type="text/css"
-      href="{% static 'css/index.css' %}"
-    />
-    <link
-      rel="shortcut icon"
-      type="image/png"
-      href="{%  static 'images/favicon.ico' %}"
-    />
+    {% load bootstrap5 %}
+    {% bootstrap_css %} {% bootstrap_javascript %}
+    <link rel="stylesheet" type="text/css" href="{% static 'css/index.css' %}" />
+    <link rel="shortcut icon"
+          type="image/png"
+          href="{% static 'images/favicon.ico' %}" />
   </head>
-
   <body>
     <div class="h-100 d-flex align-items-center justify-content-center">
       <div class="container text-center">
         <img src="{% static 'images/logo.png' %}" alt="optimuspy" />
         <p class="text-white h4 landing">
-          Сервис тестирования производительности программ на C и
-          C++ для сравнения результатов оптимизаций и разных комбинаций
-          преобразований, проводимых оптимизирующим компилятором.
+          Сервис тестирования производительности программ на C и C++ для
+          сравнения результатов оптимизаций и разных комбинаций преобразований,
+          проводимых оптимизирующим компилятором.
         </p>
         {% comment %}
         <p class="text-white">
@@ -32,14 +25,14 @@
           and C++ programs.
         </p>
         {% endcomment %}
-        <a role="button" class="btn btn-dark btn-xl" href="/login"> Войти </a>
-        <a role="button" class="btn btn-light btn-xl" href="/signup">
-          Регистрация
-        </a>
+        <a role="button" class="btn btn-dark btn-xl" href={% url 'login' %}>Войти</a>
+        <a role="button" class="btn btn-light btn-xl" href={% url 'signup' %}>Регистрация</a>
       </div>
     </div>
   </body>
   <footer class="text-center">
-    <a href="https://ops.rsu.ru"><img src="{% static 'images/ops.png' %}" class="footer" /></a>
+    <a href="https://ops.rsu.ru">
+      <img src="{% static 'images/ops.png' %}" alt="ops" class="footer" />
+    </a>
   </footer>
 </html>
