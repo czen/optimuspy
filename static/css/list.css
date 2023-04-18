@@ -3,8 +3,7 @@ body {
     height: 100%;
     padding-left: 5%;
     padding-right: 5%;
-    background-color: black;
-    background-image: url("../images/bg.gif");
+    background-color: #171717;
     background-size: 30%;
     background-position-x: center;
     background-position-y: top;

@@ -29,7 +29,7 @@ class LogIn(LoginView):
 
     def form_invalid(self, form) -> HttpResponse:
         response = super().form_invalid(form)
-        error_msg = 'Неверное имя пользователя или пароль'
+        error_msg = 'Invalid username or password'
         self.request.session['error_msg'] = error_msg
         return response
 
