@@ -1,3 +1,6 @@
+from datetime import datetime
+from pathlib import Path
+
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import LoginView
@@ -14,10 +17,12 @@ from .forms import SignUpForm, SubmitForm
 def index(request: HttpRequest):
     return render(request, 'web/index.html')
 
+
 @login_required
 def ulogout(request: HttpRequest):
     logout(request)
     return redirect('index')
+
 
 class LogIn(LoginView):
     template_name = 'web/login.html'
@@ -32,6 +37,7 @@ class LogIn(LoginView):
         error_msg = 'Invalid username or password'
         self.request.session['error_msg'] = error_msg
         return response
+
 
 class SignUp(FormView):
     template_name = 'web/signup.html'
@@ -53,6 +59,7 @@ class SignUp(FormView):
 
         return super(SignUp, self).get(request, *args, **kwargs)
 
+
 @login_required
 def ulist(request: HttpRequest):
     context = {
@@ -60,11 +67,24 @@ def ulist(request: HttpRequest):
     }
     return render(request, 'web/list.html', context=context)
 
+
 @login_required
 def submit(request: HttpRequest):
     if request.method == 'POST':
-        print(request.FILES)
+        if request.FILES:
+            handle_upload(request)
         return ulist(request)
     else:
         form = SubmitForm()
         return render(request, 'web/submit.html', {'form': form})
+
+
+def handle_upload(request: HttpRequest) -> None:
+    now = datetime.now()
+    out_dir = 'media' / Path(now.strftime(r'%Y-%m-%d_%H-%M-%S'))
+    out_dir.mkdir()
+    for file in request.FILES.getlist('files'):
+        with open(out_dir / file.name, 'wb+') as f:
+            for chunk in file.chunks():
+                f.write(chunk)
+    # TODO: process files
