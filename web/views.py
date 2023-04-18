@@ -6,7 +6,7 @@ from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
 from django.views.generic.edit import FormView
 
-from .forms import SignUpForm
+from .forms import SignUpForm, SubmitForm
 
 # Create your views here.
 
@@ -59,3 +59,12 @@ def ulist(request: HttpRequest):
         'username': request.user.username
     }
     return render(request, 'web/list.html', context=context)
+
+@login_required
+def submit(request: HttpRequest):
+    if request.method == 'POST':
+        print(request.FILES)
+        return ulist(request)
+    else:
+        form = SubmitForm()
+        return render(request, 'web/submit.html', {'form': form})

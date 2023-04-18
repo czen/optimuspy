@@ -23,8 +23,9 @@ from web import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.index, name='index'),
-    path('login', views.LogIn.as_view(), name='login'),
-    path('signup', views.SignUp.as_view(), name='signup'),
-    path('logout', views.ulogout, name='logout'),
-    path('list', views.ulist, name='list')
+    path('accounts/login/', views.LogIn.as_view(), name='login'),
+    path('accounts/signup/', views.SignUp.as_view(), name='signup'),
+    path('accounts/logout/', views.ulogout, name='logout'),
+    path('list/', views.ulist, name='list'),
+    path('submit/', views.submit, name='submit')
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
