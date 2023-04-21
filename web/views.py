@@ -1,5 +1,5 @@
-from datetime import datetime
 from pathlib import Path
+from hashlib import md5
 
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
@@ -10,6 +10,7 @@ from django.urls import reverse_lazy
 from django.views.generic.edit import FormView
 
 from .forms import SignUpForm, SubmitForm
+from .models import Task
 
 # Create your views here.
 
@@ -79,12 +80,23 @@ def submit(request: HttpRequest):
         return render(request, 'web/submit.html', {'form': form})
 
 
+def md5sum(path: Path, chunk_size: int = 4096) -> str:
+    hasher = md5()
+    for file in path.iterdir():
+        with open(file, 'rb') as f:
+            while chunk := f.read(chunk_size):
+                hasher.update(chunk)
+    return hasher.hexdigest()
+
+
 def handle_upload(request: HttpRequest) -> None:
-    now = datetime.now()
-    out_dir = 'media' / Path(now.strftime(r'%Y-%m-%d_%H-%M-%S'))
-    out_dir.mkdir()
+    task = Task(user=request.user, tests=request.POST['tests'])
+    task.save()
+    task.mkdir()
     for file in request.FILES.getlist('files'):
-        with open(out_dir / file.name, 'wb+') as f:
+        with open(task.path / file.name, 'wb+') as f:
             for chunk in file.chunks():
                 f.write(chunk)
+    task.name = request.POST['title'] or md5sum(task.path)
+    task.save()
     # TODO: process files

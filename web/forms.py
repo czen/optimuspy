@@ -22,5 +22,6 @@ class SignUpForm(UserCreationForm):
 
 
 class SubmitForm(forms.Form):
-    title = forms.CharField(max_length=50, label='Имя загрузки (пустое будет заменено хешем)', required=False)
+    title = forms.CharField(max_length=80, label='Имя загрузки (пустое будет заменено хешем)', required=False)
+    tests = forms.IntegerField(min_value=1, max_value=10, initial=2, label='Количество тестовых проходов')
     files = forms.FileField(widget=forms.ClearableFileInput(attrs={'multiple': True}), label='Файлы')
