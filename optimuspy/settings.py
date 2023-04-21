@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'crispy_forms',
     'crispy_bootstrap5',
     'bootstrap5',
+    'celery',
     'web',
 ]
 
@@ -141,3 +142,5 @@ CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 CRISPY_TEMPLATE_PACK = "bootstrap5"
 
 TASKS_PATH = Path('tasks/')
+
+CELERY_BROKER_URL = 'amqp://guest@localhost'

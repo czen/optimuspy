@@ -1,5 +1,5 @@
-from pathlib import Path
 from hashlib import md5
+from pathlib import Path
 
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
@@ -9,11 +9,12 @@ from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
 from django.views.generic.edit import FormView
 
+from optimuspy import celery_app
+
 from .forms import SignUpForm, SubmitForm
 from .models import Task
 
 # Create your views here.
-
 
 def index(request: HttpRequest):
     return render(request, 'web/index.html')
@@ -88,7 +89,7 @@ def md5sum(path: Path, chunk_size: int = 4096) -> str:
                 hasher.update(chunk)
     return hasher.hexdigest()
 
-
+@celery_app.task
 def handle_upload(request: HttpRequest) -> None:
     task = Task(user=request.user, tests=request.POST['tests'])
     task.save()
