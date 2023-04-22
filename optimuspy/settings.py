@@ -144,3 +144,5 @@ CRISPY_TEMPLATE_PACK = "bootstrap5"
 TASKS_PATH = Path('tasks/')
 
 CELERY_BROKER_URL = 'amqp://guest@localhost'
+
+TEST_UTIL = Path('catch2/optimuspy_tests.exe')
