@@ -10,6 +10,6 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         try:
             self.stdout.write(self.style.SUCCESS('Starting celery...'))
-            system('celery -A optimuspy worker --concurrency 1')
+            system('celery -A optimuspy worker --concurrency 1 -P solo --loglevel=info')
         except Exception as exc:
             self.stdout.write(self.style.ERROR(exc))

@@ -8,13 +8,13 @@ from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
 from django.views.generic.edit import FormView
-
-from optimuspy import celery_app
+from web.tasks import compiler_job
 
 from .forms import SignUpForm, SubmitForm
 from .models import Task
 
 # Create your views here.
+
 
 def index(request: HttpRequest):
     return render(request, 'web/index.html')
@@ -63,7 +63,7 @@ class SignUp(FormView):
 
 
 @login_required
-def ulist(request: HttpRequest):
+def tasks_list(request: HttpRequest):
     context = {
         'username': request.user.username
     }
@@ -71,11 +71,11 @@ def ulist(request: HttpRequest):
 
 
 @login_required
-def submit(request: HttpRequest):
+def tasks_submit(request: HttpRequest):
     if request.method == 'POST':
         if request.FILES:
             handle_upload(request)
-        return ulist(request)
+        return tasks_list(request)
     else:
         form = SubmitForm()
         return render(request, 'web/submit.html', {'form': form})
@@ -89,7 +89,7 @@ def md5sum(path: Path, chunk_size: int = 4096) -> str:
                 hasher.update(chunk)
     return hasher.hexdigest()
 
-@celery_app.task
+
 def handle_upload(request: HttpRequest) -> None:
     task = Task(user=request.user, tests=request.POST['tests'])
     task.save()
@@ -100,4 +100,4 @@ def handle_upload(request: HttpRequest) -> None:
                 f.write(chunk)
     task.name = request.POST['title'] or md5sum(task.path)
     task.save()
-    # TODO: process files
+    compiler_job.delay(task.id)
