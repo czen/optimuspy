@@ -6,20 +6,25 @@
     {% load bootstrap5 %}
     {% bootstrap_css %} {% bootstrap_javascript %}
     {% load crispy_forms_tags %}
-    <link rel="stylesheet" type="text/css" href="{% static 'css/signature.css' %}" />
+    <link rel="stylesheet"
+          type="text/css"
+          href="{% static 'css/signature.css' %}" />
     <link rel="shortcut icon"
           type="image/png"
           href="{% static 'images/favicon.ico' %}" />
   </head>
   <body>
+    <div class="mt-5 nav">
+      <button type="submit" form="form1" name="btn" value="cancel" class="btn btn-light btn-lg">Отменить</button>
+    </div>
     <div class="h-100 d-flex align-items-center justify-content-center">
       <div class="container text-center text-white">
         <h2 class="lab">Выберите тестируемую функцию</h2>
-        <form method="post">
+        <form id="form1" method="post">
           {% csrf_token %}
           {{ form|crispy }}
           {{ form.errors }}
-          <button type="submit" class="btn btn-dark btn-lg btn-m">Готово</button>
+          <button type="submit" name="btn" value="ok" class="btn btn-dark btn-lg btn-m">Готово</button>
         </form>
       </div>
     </div>

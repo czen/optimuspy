@@ -99,9 +99,14 @@ def tasks_signature(request: HttpRequest, tid: int):
     choices = [(i, l.sign) for i, l in enumerate(ct.signatures)]
 
     if request.method == 'POST':
+        if request.POST.get('btn') == 'cancel':
+            task.rmdir()
+            task.delete()
+            return redirect('list')
+
         form = SignatureChoiceForm(choices, request.POST)
         if form.is_valid():
-            i = int(form.cleaned_data.get('choice'))
+            i = int(request.POST.get('choice'))
             task.f_name = ct.signatures[i].name
             task.f_sign = ct.signatures[i].sign
             task.save()
