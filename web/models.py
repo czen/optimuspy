@@ -10,6 +10,8 @@ class Task(models.Model):
     id: int
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=80)
+    f_name = models.CharField(max_length=40)
+    f_sign = models.CharField(max_length=80)
     path = models.FilePathField()
     date = models.DateTimeField(auto_now_add=True)
     tests = models.PositiveSmallIntegerField()
@@ -23,7 +25,6 @@ class Task(models.Model):
         rmtree(self.path)
 
     def date_name(self) -> str:
-        #pylint: disable=no-member
         return self.date.strftime(r'%d %b %Y %H:%M:%S') + ': ' + self.name
 
 

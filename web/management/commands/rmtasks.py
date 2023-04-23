@@ -7,7 +7,7 @@ from django.core.management.base import BaseCommand
 class Command(BaseCommand):
     help = 'Remove all task directories'
 
-    # pylint: disable=no-member, broad-exception-caught
+    # pylint: broad-exception-caught
     def handle(self, *args, **options):
         try:
             for p in settings.TASKS_PATH.iterdir():

@@ -10,8 +10,9 @@ from django.urls import reverse_lazy
 from django.views.generic.edit import FormView
 from web.tasks import compiler_job
 
-from .forms import SignUpForm, SubmitForm
+from .forms import SignUpForm, SubmitForm, SignatureChoiceForm
 from .models import Task
+from .ops.build_tools.ctags import Ctags
 
 # Create your views here.
 
@@ -65,7 +66,8 @@ class SignUp(FormView):
 @login_required
 def tasks_list(request: HttpRequest):
     context = {
-        'username': request.user.username
+        'username': request.user.username,
+        'tasks': Task.objects.filter(user=request.user).reverse()
     }
     return render(request, 'web/list.html', context=context)
 
@@ -74,11 +76,41 @@ def tasks_list(request: HttpRequest):
 def tasks_submit(request: HttpRequest):
     if request.method == 'POST':
         if request.FILES:
-            handle_upload(request)
-        return tasks_list(request)
+            task = handle_upload(request)
+
+            if task is None:
+                return redirect('list')
+
+            if task.f_name == '':
+                return redirect('signature', tid=task.id)
+            else:
+                pass
+                # compiler_job.delay(task.id)
+        return redirect('list')
     else:
         form = SubmitForm()
         return render(request, 'web/submit.html', {'form': form})
+
+
+@login_required
+def tasks_signature(request: HttpRequest, tid: int):
+    task = Task.objects.get(id=tid)
+    ct = Ctags(task.path)
+    choices = [(i, l.sign) for i, l in enumerate(ct.signatures)]
+
+    if request.method == 'POST':
+        form = SignatureChoiceForm(choices, request.POST)
+        if form.is_valid():
+            i = int(form.cleaned_data.get('choice'))
+            task.f_name = ct.signatures[i].name
+            task.f_sign = ct.signatures[i].sign
+            task.save()
+            # compiler_job.delay(task.id)
+            return redirect('list')
+    else:
+        form = SignatureChoiceForm(choices)
+
+    return render(request, 'web/signature.html', {'form': form})
 
 
 def md5sum(path: Path, chunk_size: int = 4096) -> str:
@@ -90,7 +122,7 @@ def md5sum(path: Path, chunk_size: int = 4096) -> str:
     return hasher.hexdigest()
 
 
-def handle_upload(request: HttpRequest) -> None:
+def handle_upload(request: HttpRequest) -> Task | None:
     task = Task(user=request.user, tests=request.POST['tests'])
     task.save()
     task.mkdir()
@@ -99,5 +131,25 @@ def handle_upload(request: HttpRequest) -> None:
             for chunk in file.chunks():
                 f.write(chunk)
     task.name = request.POST['title'] or md5sum(task.path)
+
+    ct = Ctags(task.path)
+
+    if len(ct.signatures) == 0:
+        task.rmdir()
+        task.delete()
+        return None
+
+    if r := ct.resolve_signature():
+        task.f_sign = r.sign
+        task.f_name = r.name
     task.save()
-    compiler_job.delay(task.id)
+    return task
+
+
+@login_required
+def tasks_result(request: HttpRequest, tid: int):
+    task = Task.objects.get(id=tid)
+    if task.user != request.user:
+        return redirect('list')
+
+    return redirect('index')

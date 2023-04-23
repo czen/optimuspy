@@ -1,0 +1,25 @@
+html,
+body {
+    height: 100%;
+    padding-left: 10%;
+    padding-right: 10%;
+    background-color: black;
+    background-image: url("../images/bg.gif");
+    background-size: 30%;
+    background-position-x: center;
+    background-position-y: top;
+    background-repeat: no-repeat;
+}
+
+.lab {
+    margin-bottom: 10%;
+}
+
+.btn-m {
+    margin-top: 5%;
+}
+
+input {
+    max-width: 16em;
+    margin-left: calc(50% - 8em);
+};

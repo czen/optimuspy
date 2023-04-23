@@ -6,7 +6,7 @@ from django.core.management.base import BaseCommand
 class Command(BaseCommand):
     help = 'Start Celery'
 
-    # pylint: disable=no-member, broad-exception-caught
+    # pylint: broad-exception-caught
     def handle(self, *args, **options):
         try:
             self.stdout.write(self.style.SUCCESS('Starting celery...'))

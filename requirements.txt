@@ -7,3 +7,5 @@ django-crispy-forms
 python-decouple
 djlint
 Celery
+pylint-django
+pylint-celery

@@ -18,8 +18,18 @@
         <a role="button" class="btn btn-dark btn-sm" href={% url 'logout' %}>Выйти</a>
       </div>
     </div>
-    <div class="h-100 d-flex align-items-center justify-content-center">
-      <div class="container text-center text-white">{% comment %} ... {% endcomment %}</div>
+    <div class="h-80 mt-5 d-flex align-items-center justify-content-center">
+      <div class="container text-white">
+        <span>
+          {% block content %}
+            {% for task in tasks %}
+              <a role="button"
+                 class="btn btn-dark btn-lg m-2 d-block text-start"
+                 href="{% url 'result' tid=task.id %}">{{ task.date_name }}</a>
+            {% endfor %}
+          {% endblock content %}
+        </span>
+      </div>
     </div>
   </body>
 </html>
