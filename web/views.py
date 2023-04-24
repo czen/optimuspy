@@ -12,7 +12,7 @@ from web.tasks import compiler_job
 
 from .forms import SignUpForm, SubmitForm, SignatureChoiceForm
 from .models import Task
-from .ops.build_tools.ctags import Ctags
+from .ops.build_tools.ctags import Ctags, MainFoundException
 
 # Create your views here.
 
@@ -65,9 +65,11 @@ class SignUp(FormView):
 
 @login_required
 def tasks_list(request: HttpRequest):
+    msg = request.session.pop('msg', '')
     context = {
         'username': request.user.username,
-        'tasks': Task.objects.filter(user=request.user).reverse()
+        'tasks': Task.objects.filter(user=request.user).reverse(),
+        'msg': msg
     }
     return render(request, 'web/list.html', context=context)
 
@@ -75,26 +77,31 @@ def tasks_list(request: HttpRequest):
 @login_required
 def tasks_submit(request: HttpRequest):
     if request.method == 'POST':
-        if request.FILES:
+        form = SubmitForm(request.POST, request.FILES)
+        if form.is_valid():
             task = handle_upload(request)
 
             if task is None:
+                request.session['msg'] = 'Отправка отменена из-за несоотвествием требованиям'
                 return redirect('list')
 
             if task.f_name == '':
                 return redirect('signature', tid=task.id)
             else:
-                pass
+                request.session['msg'] = 'Отправлено'
                 # compiler_job.delay(task.id)
-        return redirect('list')
+            return redirect('list')
     else:
         form = SubmitForm()
-        return render(request, 'web/submit.html', {'form': form})
+    return render(request, 'web/submit.html', {'form': form})
 
 
 @login_required
 def tasks_signature(request: HttpRequest, tid: int):
     task = Task.objects.get(id=tid)
+    if task.user != request.user:
+        return redirect('list')
+
     ct = Ctags(task.path)
     choices = [(i, l.sign) for i, l in enumerate(ct.signatures)]
 
@@ -102,6 +109,7 @@ def tasks_signature(request: HttpRequest, tid: int):
         if request.POST.get('btn') == 'cancel':
             task.rmdir()
             task.delete()
+            request.session['msg'] = 'Отправка отменена пользователем'
             return redirect('list')
 
         form = SignatureChoiceForm(choices, request.POST)
@@ -111,6 +119,7 @@ def tasks_signature(request: HttpRequest, tid: int):
             task.f_sign = ct.signatures[i].sign
             task.save()
             # compiler_job.delay(task.id)
+            request.session['msg'] = 'Отправлено'
             return redirect('list')
     else:
         form = SignatureChoiceForm(choices)
@@ -137,7 +146,12 @@ def handle_upload(request: HttpRequest) -> Task | None:
                 f.write(chunk)
     task.name = request.POST['title'] or md5sum(task.path)
 
-    ct = Ctags(task.path)
+    try:
+        ct = Ctags(task.path)
+    except MainFoundException:
+        task.rmdir()
+        task.delete()
+        return None
 
     if len(ct.signatures) == 0:
         task.rmdir()

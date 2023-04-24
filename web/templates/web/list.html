@@ -18,8 +18,9 @@
         <a role="button" class="btn btn-dark btn-sm" href={% url 'logout' %}>Выйти</a>
       </div>
     </div>
-    <div class="h-80 mt-5 d-flex align-items-center justify-content-center">
+    <div class="h-80 d-flex align-items-center justify-content-center">
       <div class="container text-white">
+        <h4 class="m-5 text-center">{{ msg }}</h4>
         <span>
           {% block content %}
             {% for task in tasks %}
