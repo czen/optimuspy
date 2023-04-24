@@ -9,3 +9,4 @@ djlint
 Celery
 pylint-django
 pylint-celery
+django-extensions
