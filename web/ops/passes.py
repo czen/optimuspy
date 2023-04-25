@@ -26,14 +26,14 @@ class Pass():
         return code
 
 
-class OMPPath(Pass):
+class OMPPass(Pass):
     '''Проход с бэкендом OpenMP'''
     _args = '-backend=openmp'
 
 
 class Passes(Enum):
     NoOptPass = 0
-    OMPPath = 1
+    OMPPass = 1
 
     @staticmethod
     def get(ind: int, default=None) -> Pass:
@@ -41,13 +41,16 @@ class Passes(Enum):
             case 0:
                 return Pass
             case 1:
-                return OMPPath
+                return OMPPass
         return default
 
     def __str__(self) -> str:
+        return super().__str__().split('.')[-1]
+
+    def to_str(self) -> str:
         match self:
             case Passes.NoOptPass:
                 return 'Без оптимизации'
-            case Passes.OMPPath:
+            case Passes.OMPPass:
                 return 'OpenMP backend'
         return super().__str__()

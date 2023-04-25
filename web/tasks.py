@@ -2,6 +2,7 @@ import shutil
 import subprocess as sp
 from os import chdir, getcwd
 from pathlib import Path
+import tarfile
 
 from celery.utils.log import get_logger
 
@@ -33,6 +34,9 @@ def compiler_job(task_id: int):
 
     for i in range(len(Passes)):
         try:
+            b = Benchmark(task=task, num=i)
+            b.save()
+
             # Create benchmark directory
             subdir = path / str(i)
             subdir.mkdir()
@@ -40,8 +44,6 @@ def compiler_job(task_id: int):
             # Copy src files to subdir
             for file in files:
                 shutil.copy(file, subdir)
-
-            b = Benchmark(task=task, num=i)
 
             # Run opsc pass
             p: Pass = Passes.get(i)(subdir.iterdir())
@@ -60,6 +62,9 @@ def compiler_job(task_id: int):
 
             except Exception as e2:
                 logger.info(e2)
+                b.error = True
+                b.save()
+
             finally:
                 chdir(cwd)
 
@@ -78,15 +83,34 @@ def compiler_job(task_id: int):
 
             logger.info('benchmark %d exit code: %s', i, ps.returncode)
 
+            # Cleanup and package
+            catch2.cleanup(subdir)
+
+            cwd = getcwd()
+            try:
+                chdir(subdir)
+                files2 = list(Path('.').iterdir())
+                with tarfile.open(f'{task.hash}.{Passes(i)}.tar.gz', 'w:gz') as tar:
+                    for file in files2:
+                        tar.add(file)
+
+                for file in files2:
+                    file.unlink()
+            except Exception as e2:
+                logger.info(e2)
+                b.error = True
+                b.save()
+            finally:
+                chdir(cwd)
+
         except Exception as e:
             logger.error(e)
-            # Cd back
-            chdir(cwd)
+            b.error = True
+            b.save()
 
-    # Cleanup
-    for i in range(len(Passes)):
-        pass
-
+    # Cleanup task root dir
+    for file in files:
+        file.unlink()
 
     task.ready = True
     task.save()

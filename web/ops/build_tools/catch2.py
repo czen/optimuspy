@@ -47,3 +47,10 @@ def parse_benchmark(path: Path):
         except Exception:
             return 0, 'err'
         return v, u
+
+
+def cleanup(path: Path):
+    for file in ('Makefile', '__optimus_debug_hook.h',
+                 '__optimus_tests.cpp', '__optimus_tests.txt',
+                 '__optimus_tests.exe'):
+        (path / file).unlink()
