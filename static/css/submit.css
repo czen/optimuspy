@@ -28,17 +28,22 @@ body {
 
 .hoverable {
     position: relative;
-  }
+}
 
-  .hoverable>.hoverable__tooltip {
+.hoverable>.hoverable__tooltip {
     display: none;
-  }
+}
 
-  .hoverable:hover>.hoverable__tooltip {
+.hoverable:hover>.hoverable__tooltip {
     display: inline;
     position: absolute;
     top: 1em;
     left: 1em;
+    right: 1em;
     background: #888;
     border: 1px solid black;
-  }
+}
+
+.reqs {
+    opacity: 50%;
+}

@@ -1,0 +1,19 @@
+{
+  "sqltools.connections": [
+    {
+      "previewLimit": 50,
+      "driver": "SQLite",
+      "name": "optimuspy",
+      "database": "${workspaceFolder:optimuspy}/db.sqlite3"
+    }
+  ],
+  "python.linting.pylintArgs": [
+    "--load-plugins=pylint_django, pylint_celery",
+    "--django-settings-module=optimuspy.settings",
+    "--disable=missing-docstring",
+    "--disable=invalid-name"],
+  "sqltools.useNodeRuntime": true,
+  "sqltools.autoOpenSessionFiles": false,
+  "sqltools.autoConnectTo": ["optimuspy"],
+  "sqltools.disableNodeDetectNotifications": true
+}
