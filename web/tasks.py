@@ -13,6 +13,8 @@ from .ops.passes import Pass, Passes
 
 logger = get_logger(__name__)
 
+# pylint: disable=broad-exception-caught
+
 
 @celery_app.task
 def compiler_job(task_id: int):
@@ -29,7 +31,6 @@ def compiler_job(task_id: int):
     # Filter sources only
     c_files = [f.name for f in files if f.name.endswith('.c')]
 
-    cwd = getcwd()
     for i in range(len(Passes)):
         try:
             # Create benchmark directory
@@ -48,12 +49,19 @@ def compiler_job(task_id: int):
                 b.error = True
 
             # Create all necessary build files
-            catch2.setup(subdir, c_files, task.f_name, task.f_sign, task.tests) # <-
+            catch2.setup(subdir, c_files, task.f_name, task.f_sign, task.tests)  # <-
 
-            chdir(subdir)
+            cwd = getcwd()
+            try:
+                chdir(subdir)
 
-            # Run build and test routines
-            ps = sp.run(['make'], check=False)
+                # Run build and test routines
+                ps = sp.run(['make'], check=False)
+
+            except Exception as e2:
+                logger.info(e2)
+            finally:
+                chdir(cwd)
 
             # Parse benchmark results
             v, u = catch2.parse_benchmark(subdir)
@@ -69,10 +77,9 @@ def compiler_job(task_id: int):
             b.save()
 
             logger.info('benchmark %d exit code: %s', i, ps.returncode)
-        # pylint: disable=broad-exception-caught
-        except Exception as exc:
-            logger.error(exc)
-        finally:
+
+        except Exception as e:
+            logger.error(e)
             # Cd back
             chdir(cwd)
 
