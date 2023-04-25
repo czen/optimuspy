@@ -26,4 +26,19 @@ body {
     margin-right: 20%;
 }
 
-/* test */
+.hoverable {
+    position: relative;
+  }
+
+  .hoverable>.hoverable__tooltip {
+    display: none;
+  }
+
+  .hoverable:hover>.hoverable__tooltip {
+    display: inline;
+    position: absolute;
+    top: 1em;
+    left: 1em;
+    background: #888;
+    border: 1px solid black;
+  }

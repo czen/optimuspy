@@ -10,6 +10,7 @@ class Task(models.Model):
     id: int
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=80)
+    hash = models.CharField(max_length=32)
     f_name = models.CharField(max_length=40)
     f_sign = models.CharField(max_length=80)
     path = models.FilePathField()

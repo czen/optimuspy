@@ -144,7 +144,8 @@ def handle_upload(request: HttpRequest) -> Task | None:
         with open(task.path / file.name, 'wb+') as f:
             for chunk in file.chunks():
                 f.write(chunk)
-    task.name = request.POST['title'] or md5sum(task.path)
+    task.hash = md5sum(task.path)
+    task.name = request.POST['title'] or task.hash
 
     try:
         ct = Ctags(task.path)

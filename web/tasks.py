@@ -83,6 +83,11 @@ def compiler_job(task_id: int):
             # Cd back
             chdir(cwd)
 
+    # Cleanup
+    for i in range(len(Passes)):
+        pass
+
+
     task.ready = True
     task.save()
     logger.info('Finished execution of task %s', task.id)
