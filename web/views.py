@@ -89,7 +89,7 @@ def tasks_submit(request: HttpRequest):
                 return redirect('signature', tid=task.id)
             else:
                 request.session['msg'] = 'Отправлено'
-                # compiler_job.delay(task.id)
+                compiler_job.delay(task.id)
             return redirect('list')
     else:
         form = SubmitForm()
@@ -118,7 +118,7 @@ def tasks_signature(request: HttpRequest, tid: int):
             task.f_name = ct.signatures[i].name
             task.f_sign = ct.signatures[i].sign
             task.save()
-            # compiler_job.delay(task.id)
+            compiler_job.delay(task.id)
             request.session['msg'] = 'Отправлено'
             return redirect('list')
     else:

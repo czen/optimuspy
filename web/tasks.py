@@ -1,4 +1,4 @@
-# import shutil
+import shutil
 import subprocess as sp
 from os import chdir, getcwd
 from pathlib import Path
@@ -7,8 +7,9 @@ from celery.utils.log import get_logger
 
 from optimuspy import celery_app
 
-from .models import Task
+from .models import Task, Benchmark
 from .ops.build_tools import catch2
+from .ops.passes import Pass, Passes
 
 logger = get_logger(__name__)
 
@@ -26,21 +27,54 @@ def compiler_job(task_id: int):
     files = list(path.iterdir())
 
     # Filter sources only
-    c_files = [f for f in files if f.name.endswith('.c')]
-
-    # Create all necessary build files
-    catch2.setup(path, c_files, task.tests)
+    c_files = [f.name for f in files if f.name.endswith('.c')]
 
     cwd = getcwd()
-    try:
-        chdir(path)
-        ps = sp.run(['make'], check=False)
-        logger.info('compiler exit code: %s', ps.returncode)
-    # pylint: disable=broad-exception-caught
-    except Exception as exc:
-        logger.error(exc)
-    finally:
-        chdir(cwd)
+    for i in range(len(Passes)):
+        try:
+            # Create benchmark directory
+            subdir = path / str(i)
+            subdir.mkdir()
+
+            # Copy src files to subdir
+            for file in files:
+                shutil.copy(file, subdir)
+
+            b = Benchmark(task=task, num=i)
+
+            # Run opsc pass
+            p: Pass = Passes.get(i)(subdir.iterdir())
+            if p.run() != 0:
+                b.error = True
+
+            # Create all necessary build files
+            catch2.setup(subdir, c_files, task.f_name, task.f_sign, task.tests) # <-
+
+            chdir(subdir)
+
+            # Run build and test routines
+            ps = sp.run(['make'], check=False)
+
+            # Parse benchmark results
+            v, u = catch2.parse_benchmark(subdir)
+
+            # Check for parsing errors
+            if u == 'err':
+                b.error = True
+
+            # Assign benchmark results
+            b.value = v
+            b.unit = u
+
+            b.save()
+
+            logger.info('benchmark %d exit code: %s', i, ps.returncode)
+        # pylint: disable=broad-exception-caught
+        except Exception as exc:
+            logger.error(exc)
+        finally:
+            # Cd back
+            chdir(cwd)
 
     task.ready = True
     task.save()

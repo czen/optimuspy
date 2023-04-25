@@ -30,6 +30,7 @@ class Task(models.Model):
 
 class Benchmark(models.Model):
     task = models.ForeignKey(Task, on_delete=models.CASCADE)
-    value = models.PositiveIntegerField()
+    num = models.PositiveIntegerField()
+    value = models.FloatField()
     unit = models.CharField(max_length=4)
     error = models.BooleanField(default=False)
