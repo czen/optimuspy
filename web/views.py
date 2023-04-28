@@ -1,6 +1,9 @@
 from hashlib import md5
 from pathlib import Path
 
+from bokeh.embed import components
+from bokeh.models import ColumnDataSource, HoverTool
+from bokeh.plotting import figure
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import LoginView
@@ -8,11 +11,13 @@ from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
 from django.views.generic.edit import FormView
+
 from web.tasks import compiler_job
 
-from .forms import SignUpForm, SubmitForm, SignatureChoiceForm
-from .models import Task
+from .forms import SignatureChoiceForm, SignUpForm, SubmitForm
+from .models import Benchmark, Task
 from .ops.build_tools.ctags import Ctags, MainFoundException
+from .ops.passes import Passes
 
 # Create your views here.
 
@@ -173,6 +178,34 @@ def tasks_result(request: HttpRequest, tid: int):
         return redirect('list')
 
     if task.ready:
-        pass # TODO: result page
+        q = list(Benchmark.objects.filter(task=task))
+
+        data = ColumnDataSource(data={
+            'x': [Passes(i).to_str() for i in range(len(Passes))],
+            'y': [b.value for b in q],
+            'time': [b.value for b in q],
+            'unit': [b.unit for b in q],
+            'color': ['blue' if not b.error else 'red' for b in q],
+        })
+
+        hover = HoverTool(
+            tooltips=[
+                ('time', '@time @unit')
+            ]
+        )
+
+        plot = figure(title=task.name, x_range=data.data['x'], sizing_mode='stretch_width')
+        plot.vbar(x='x', top='y', color='color', width=0.5, source=data)
+        plot.xaxis.axis_label = 'Проход'
+        plot.yaxis.axis_label = 'Время работы программы'
+        plot.add_tools(hover)
+
+        script, div = components(plot)
+
+        context = {
+            'username': request.user.username,
+            'script': script, 'div': div
+        }
+        return render(request, 'web/result_ready.html', context=context)
     else:
         return render(request, 'web/result_wait.html')

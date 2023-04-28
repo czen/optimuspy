@@ -45,7 +45,7 @@ def parse_benchmark(path: Path):
             v, u = float(tokens[0]), tokens[1]
         # pylint: disable=broad-exception-caught
         except Exception:
-            return 0, 'err'
+            return -1, 'err'
         return v, u
 
 
