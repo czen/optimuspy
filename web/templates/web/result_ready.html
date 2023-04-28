@@ -1,43 +1,42 @@
 {% load static %}
 <!DOCTYPE html>
-<html>
-    <head>
-        <title>Просмотр</title>
-        {% load bootstrap5 %}
-        {% bootstrap_css %} {% bootstrap_javascript %}
-        {% load crispy_forms_tags %}
-        <link rel="stylesheet"
-              type="text/css"
-              href="{% static 'css/result_ready.css' %}" />
-        <link rel="shortcut icon"
-              type="image/png"
-              href="{% static 'images/favicon.ico' %}" />
-        <link href="https://cdn.pydata.org/bokeh/release/bokeh-3.1.0.min.css"
-              rel="stylesheet"
-              type="text/css">
-        <link href="https://cdn.pydata.org/bokeh/release/bokeh-widgets-3.1.0.min.css"
-              rel="stylesheet"
-              type="text/css">
-    </head>
-    <body>
-        <div class="mt-5 nav">
-            <a role="button" class="btn btn-light btn-lg" href={% url 'list' %}>Назад</a>
-            <div>
-                <p class="text-white text-center">{{ username }}</p>
-                <a role="button" class="btn btn-dark btn-sm" href={% url 'logout' %}>Выйти</a>
-            </div>
-        </div>
-        <div class="d-flex align-items-center justify-content-center">
-            <div class="m-5 container">
-                <div class="graph">
-                    {{ div|safe }}
-                </div>
-            </div>
-        </div>
-        <script src="https://cdn.bokeh.org/bokeh/release/bokeh-3.1.0.min.js"></script>
-        <script src="https://cdn.bokeh.org/bokeh/release/bokeh-widgets-3.1.0.min.js"></script>
-        <script src="https://cdn.bokeh.org/bokeh/release/bokeh-tables-3.1.0.min.js"></script>
-        <script src="https://cdn.bokeh.org/bokeh/release/bokeh-api-3.1.0.min.js"></script>
-        {{ script|safe }}
-    </body>
+<html lang="ru-RU">
+  <head>
+    <title>Просмотр</title>
+    {% load bootstrap5 %}
+    {% bootstrap_css %} {% bootstrap_javascript %}
+    <link rel="stylesheet"
+          type="text/css"
+          href="{% static 'css/result_ready.css' %}" />
+    <link rel="shortcut icon"
+          type="image/png"
+          href="{% static 'images/favicon.ico' %}" />
+    <link href="https://cdn.pydata.org/bokeh/release/bokeh-3.1.0.min.css"
+          rel="stylesheet"
+          type="text/css">
+    <link href="https://cdn.pydata.org/bokeh/release/bokeh-widgets-3.1.0.min.css"
+          rel="stylesheet"
+          type="text/css">
+    <meta name="description" content="View result of a task">
+    <meta name="keywords" content="Result, View">
+  </head>
+  <body>
+    <div class="mt-5 nav">
+      <a role="button" class="btn btn-light btn-lg" href={% url 'list' %}>Назад</a>
+      <div>
+        <p class="text-white text-center">{{ username }}</p>
+        <a role="button" class="btn btn-dark btn-sm" href={% url 'logout' %}>Выйти</a>
+      </div>
+    </div>
+    <div class="d-flex align-items-center justify-content-center">
+      <div class="m-5 container">
+        <div class="graph">{{ div|safe }}</div>
+      </div>
+    </div>
+    <script src="https://cdn.bokeh.org/bokeh/release/bokeh-3.1.0.min.js"></script>
+    <script src="https://cdn.bokeh.org/bokeh/release/bokeh-widgets-3.1.0.min.js"></script>
+    <script src="https://cdn.bokeh.org/bokeh/release/bokeh-tables-3.1.0.min.js"></script>
+    <script src="https://cdn.bokeh.org/bokeh/release/bokeh-api-3.1.0.min.js"></script>
+    {{ script|safe }}
+  </body>
 </html>
