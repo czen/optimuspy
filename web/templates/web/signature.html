@@ -1,6 +1,6 @@
 {% load static %}
 <!DOCTYPE html>
-<html>
+<html lang="ru-RU">
   <head>
     <title>Выбор функции</title>
     {% load bootstrap5 %}
@@ -12,10 +12,16 @@
     <link rel="shortcut icon"
           type="image/png"
           href="{% static 'images/favicon.ico' %}" />
+    <meta name="description" content="Select function signature">
+    <meta name="keywords" content="Signature, Select">
   </head>
   <body>
     <div class="mt-5 nav">
-      <button type="submit" form="form1" name="btn" value="cancel" class="btn btn-light btn-lg">Отменить</button>
+      <button type="submit"
+              form="form1"
+              name="btn"
+              value="cancel"
+              class="btn btn-light btn-lg">Отменить</button>
     </div>
     <div class="h-100 d-flex align-items-center justify-content-center">
       <div class="container text-center text-white">

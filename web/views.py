@@ -172,4 +172,7 @@ def tasks_result(request: HttpRequest, tid: int):
     if task.user != request.user:
         return redirect('list')
 
-    return redirect('index')
+    if task.ready:
+        pass # TODO: result page
+    else:
+        return render(request, 'web/result_wait.html')
