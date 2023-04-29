@@ -30,5 +30,6 @@ urlpatterns = [
     path('tasks/submit/', views.tasks_submit, name='submit'),
     path('tasks/<int:tid>/result', views.tasks_result, name='result'),
     path('tasks/<int:tid>/signature/', views.tasks_signature, name='signature'),
+    path('tasks/<int:tid>/ready/', views.tasks_ready, name='ready'),
     path('download/<int:bid>/', views.download, name='download')
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

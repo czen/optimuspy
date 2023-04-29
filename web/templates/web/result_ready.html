@@ -5,9 +5,7 @@
     <title>Просмотр</title>
     {% load bootstrap5 %}
     {% bootstrap_css %} {% bootstrap_javascript %}
-    <link rel="stylesheet"
-          type="text/css"
-          href="{% static 'css/main.css' %}" />
+    <link rel="stylesheet" type="text/css" href="{% static 'css/main.css' %}" />
     <link rel="shortcut icon"
           type="image/png"
           href="{% static 'images/favicon.ico' %}" />
@@ -35,13 +33,11 @@
           <div class="mb-5">
             <h4>Загрузки</h4>
           </div>
-          {% block content %}
-            {% for d in downloads %}
-              <a role="button"
-                 class="btn btn-dark btn-lg m-2 d-block text-start"
-                 href="{% url 'download' bid=d.id %}">Скачать {{ d.text }}</a>
-            {% endfor %}
-          {% endblock content %}
+          {% for d in downloads %}
+            <a role="button"
+               class="btn btn-dark btn-lg m-2 d-block text-start"
+               href="{% url 'download' bid=d.id %}">Скачать {{ d.text }}</a>
+          {% endfor %}
         </div>
       </div>
     </div>

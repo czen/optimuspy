@@ -24,13 +24,11 @@
       <div class="container text-white">
         <h4 class="m-5 text-center">{{ msg }}</h4>
         <span>
-          {% block content %}
-            {% for task in tasks %}
-              <a role="button"
-                 class="btn btn-dark btn-lg m-2 d-block text-start"
-                 href="{% url 'result' tid=task.id %}">{{ task.date_name }}</a>
-            {% endfor %}
-          {% endblock content %}
+          {% for task in tasks %}
+            <a role="button"
+               class="btn btn-dark btn-lg m-2 d-block text-start"
+               href="{% url 'result' tid=task.id %}">{{ task.date_name }}</a>
+          {% endfor %}
         </span>
       </div>
     </div>

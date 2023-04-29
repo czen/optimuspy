@@ -7,7 +7,7 @@ from bokeh.plotting import figure
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import LoginView
-from django.http import HttpRequest, HttpResponse
+from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
 from django.views.generic.edit import FormView
@@ -209,7 +209,12 @@ def tasks_result(request: HttpRequest, tid: int):
         }
         return render(request, 'web/result_ready.html', context=context)
     else:
-        return render(request, 'web/result_wait.html')
+        return render(request, 'web/result_wait.html', {'tid': task.id})
+
+
+def tasks_ready(_: HttpRequest, tid: int):
+    task = Task.objects.get(id=tid)
+    return JsonResponse({'ready': task.ready})
 
 
 @login_required
