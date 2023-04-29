@@ -31,6 +31,18 @@
     <div class="d-flex align-items-center justify-content-center">
       <div class="m-5 container">
         <div class="graph">{{ div|safe }}</div>
+        <div class="mt-5 text-white text-center">
+          <div class="mb-5">
+            <h4>Загрузки</h4>
+          </div>
+          {% block content %}
+            {% for d in downloads %}
+              <a role="button"
+                 class="btn btn-dark btn-lg m-2 d-block text-start"
+                 href="{% url 'download' bid=d.id %}">Скачать {{ d.text }}</a>
+            {% endfor %}
+          {% endblock content %}
+        </div>
       </div>
     </div>
     <script src="https://cdn.bokeh.org/bokeh/release/bokeh-3.1.0.min.js"></script>

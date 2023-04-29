@@ -73,7 +73,7 @@ def tasks_list(request: HttpRequest):
     msg = request.session.pop('msg', '')
     context = {
         'username': request.user.username,
-        'tasks': Task.objects.filter(user=request.user).reverse(),
+        'tasks': Task.objects.filter(user=request.user).order_by('-date'),
         'msg': msg
     }
     return render(request, 'web/list.html', context=context)
@@ -204,8 +204,26 @@ def tasks_result(request: HttpRequest, tid: int):
 
         context = {
             'username': request.user.username,
-            'script': script, 'div': div
+            'script': script, 'div': div,
+            'downloads': [b for b in q if not b.error]
         }
         return render(request, 'web/result_ready.html', context=context)
     else:
         return render(request, 'web/result_wait.html')
+
+
+@login_required
+def download(request: HttpRequest, bid: int):
+    b = Benchmark.objects.get(id=bid)
+    if b.task.user != request.user:
+        return redirect('list')
+
+    data = None
+
+    with open(b.path, 'rb') as f:
+        data = f.read()
+
+    response = HttpResponse(data, content_type='application/tar+gzip')
+    response['Content-Length'] = b.path.stat().st_size
+    response['Content-Disposition'] = f'attachment; filename={b.path.name}'
+    return response

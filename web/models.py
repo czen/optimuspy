@@ -1,11 +1,17 @@
+from functools import cached_property
+from pathlib import Path
 from shutil import rmtree
 
 from django.conf import settings
+# pylint: disable=imported-auth-user
 from django.contrib.auth.models import User
 from django.db import models
 
+from .ops.passes import Passes
 
 # Create your models here.
+
+
 class Task(models.Model):
     id: int
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -35,3 +41,11 @@ class Benchmark(models.Model):
     value = models.FloatField(null=True)
     unit = models.CharField(max_length=4)
     error = models.BooleanField(default=False)
+
+    @cached_property
+    def path(self):
+        return Path(self.task.path) / f'{self.num}/{self.task.hash}.{Passes(self.num)}.tar.gz'
+
+    @cached_property
+    def text(self):
+        return Passes(self.num).to_str()
