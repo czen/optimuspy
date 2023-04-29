@@ -12,9 +12,30 @@ body {
     align-items: center;
 }
 
+.landing
+{
+    margin-top: 2%;
+}
+
+.btn-xl
+{
+    margin-top: 2%;
+    margin-left: 1%;
+    margin-right: 1%;
+    padding: 10px 20px;
+    font-size: x-large;
+}
+
 .lab {
     margin-top: 5%;
     margin-bottom: 5%;
+}
+
+.graph {
+    display : block;
+    margin: 0 auto;
+    text-align: left;
+    width: 800px;
 }
 
 .btn-m {
