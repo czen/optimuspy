@@ -11,3 +11,4 @@ pylint-django
 pylint-celery
 django-extensions
 bokeh
+# honcho
