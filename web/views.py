@@ -103,7 +103,11 @@ def tasks_submit(request: HttpRequest):
 
 @login_required
 def tasks_signature(request: HttpRequest, tid: int):
-    task = Task.objects.get(id=tid)
+    try:
+        task = Task.objects.get(id=tid)
+    except Task.DoesNotExist:
+        return redirect('submit')
+
     if task.user != request.user:
         return redirect('list')
 
@@ -173,7 +177,14 @@ def handle_upload(request: HttpRequest) -> Task | None:
 
 @login_required
 def tasks_result(request: HttpRequest, tid: int):
-    task = Task.objects.get(id=tid)
+    try:
+        task = Task.objects.get(id=tid)
+    except Task.DoesNotExist:
+        return redirect('list')
+
+    if task.f_name == '':
+        return redirect('signature', tid=task.id)
+
     if task.user != request.user:
         return redirect('list')
 
@@ -213,13 +224,20 @@ def tasks_result(request: HttpRequest, tid: int):
 
 
 def tasks_ready(_: HttpRequest, tid: int):
-    task = Task.objects.get(id=tid)
-    return JsonResponse({'ready': task.ready})
+    try:
+        task = Task.objects.get(id=tid)
+        return JsonResponse({'ready': task.ready})
+    except Task.DoesNotExist:
+        return JsonResponse({'ready': False})
 
 
 @login_required
 def download(request: HttpRequest, bid: int):
-    b = Benchmark.objects.get(id=bid)
+    try:
+        b = Benchmark.objects.get(id=bid)
+    except Benchmark.DoesNotExist:
+        return redirect('list')
+
     if b.task.user != request.user:
         return redirect('list')
 
