@@ -84,7 +84,7 @@ def compiler_job(task_id: int):
             logger.info('benchmark %d exit code: %s', i, ps.returncode)
 
             # Cleanup and package
-            catch2.cleanup(subdir)
+            catch2.cleanup(subdir, files)
 
             cwd = getcwd()
             try:

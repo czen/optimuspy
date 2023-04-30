@@ -37,20 +37,21 @@ def setup(path: Path, c_files: list[Path], f_name: str, f_sign: str, tests: int)
 
 
 def parse_benchmark(path: Path):
-    with open(path / '__optimus_tests.txt', 'r', encoding='utf8') as f:
-        while not f.readline().startswith('opt_bench'):
-            pass
-        try:
-            tokens = [i for i in f.readline().split(' ') if i]
-            v, u = float(tokens[0]), tokens[1]
-        # pylint: disable=broad-exception-caught
-        except Exception:
-            return -1, 'err'
-        return v, u
+    v, u = -1, 'err'
+    try:
+        with open(path / '__optimus_tests.txt', 'r', encoding='utf8') as f:
+            for line in f:
+                if line.startswith('opt_bench'):
+                    tokens = [i for i in f.readline().split(' ') if i]
+                    return float(tokens[0]), tokens[1]
+     # pylint: disable=broad-exception-caught
+    except Exception as exc:
+        print(exc)
+    return v, u
 
 
-def cleanup(path: Path):
-    for file in ('Makefile', '__optimus_debug_hook.h',
-                 '__optimus_tests.cpp', '__optimus_tests.txt',
-                 '__optimus_tests.exe'):
-        (path / file).unlink()
+def cleanup(path: Path, files: list[Path]):
+    _files = set(file.name for file in files)
+    for file in path.iterdir():
+        if file.name not in _files:
+            file.unlink()
