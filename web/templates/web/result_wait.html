@@ -29,7 +29,7 @@
               if (json.ready)
                   location.reload();
               else
-                  setTimeout(function () { get_results(); }, 10000);
+                  setTimeout(function () { get_results(); }, {{ timeout }});
           }
       });
     }

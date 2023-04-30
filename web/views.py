@@ -220,7 +220,11 @@ def tasks_result(request: HttpRequest, tid: int):
         }
         return render(request, 'web/result_ready.html', context=context)
     else:
-        return render(request, 'web/result_wait.html', {'tid': task.id})
+        context = {
+            'tid': task.id,
+            'timeout': 10000
+        }
+        return render(request, 'web/result_wait.html', context=context)
 
 
 def tasks_ready(_: HttpRequest, tid: int):
