@@ -1,0 +1,6 @@
+-r requirements.txt
+pylint
+autopep8
+djlint
+pylint-django
+pylint-celery

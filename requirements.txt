@@ -1,14 +1,9 @@
-pylint
-autopep8
 django
 django-bootstrap-v5
 crispy-bootstrap5
 django-crispy-forms
 python-decouple
-djlint
 Celery
-pylint-django
-pylint-celery
 django-extensions
 bokeh
 # honcho
