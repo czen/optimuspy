@@ -31,9 +31,6 @@ class Task(models.Model):
     def rmdir(self) -> None:
         rmtree(self.path)
 
-    def date_name(self) -> str:
-        return self.date.strftime(r'%d %b %Y %H:%M:%S') + ': ' + self.name
-
 
 class Benchmark(models.Model):
     task = models.ForeignKey(Task, on_delete=models.CASCADE)
