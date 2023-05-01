@@ -7,7 +7,7 @@ from django.conf import settings
 
 class Pass():
     '''Проход без аргументов. Не делает оптимизаций.'''
-    _args: str = ''
+    _args: list[str] = []
     _c_files: list[Path]
 
     def __init__(self, c_files: list[Path]) -> None:
@@ -20,15 +20,14 @@ class Pass():
     def run(self) -> int:
         code = 0
         for file in self._c_files:
-            print(f"{settings.OPSC_PATH}/opsc {self._args} {file} -o {file}")
-            with sp.Popen(f"{settings.OPSC_PATH}/opsc {self._args} {file} -o {file}") as p:
+            with sp.Popen([f'{settings.OPSC_PATH}/opsc', *self._args, f'{file}', '-o', f'{file}']) as p:
                 code = max(code, p.wait())
         return code
 
 
 class OMPPass(Pass):
     '''Проход с бэкендом OpenMP'''
-    _args = '-backend=openmp'
+    _args = ['-backend=openmp']
 
 
 class Passes(Enum):

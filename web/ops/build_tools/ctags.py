@@ -25,7 +25,7 @@ class Ctags:
     def __init__(self, path: str | Path) -> None:
         self.path = Path(path)
         self.lines = []
-        with sp.Popen(f'ctags -R -f- {self.path}', stdout=sp.PIPE) as p:
+        with sp.Popen(['ctags', '-R', '-f-', f'{self.path}'], stdout=sp.PIPE) as p:
             while line := p.stdout.readline():
                 name, path, sign, typ = line.decode().strip().split('\t')
                 if name == 'main' and typ == 'f':
