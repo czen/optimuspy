@@ -7,7 +7,7 @@ build:
 \tg++ $(OFLAGS) {} __optimus_tests.cpp ../../../catch2/catch_amalgamated.o -o __optimus_tests -I../../../catch2
 
 test:
-\t./__optimus_tests.exe --benchmark-samples {} --out __optimus_tests.txt
+\t./__optimus_tests --benchmark-samples {} --out __optimus_tests.txt
 '''
 
 TESTS = '''#include "../../../catch2/catch_amalgamated.hpp"

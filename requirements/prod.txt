@@ -6,4 +6,3 @@ python-decouple
 Celery
 django-extensions
 bokeh
-# honcho
