@@ -30,7 +30,7 @@ class Ctags:
                 name, path, sign, typ = line.decode().strip().split('\t')
                 if name == 'main' and typ == 'f':
                     raise MainFoundException
-                self.lines.append(Line(name, path, sign.strip('/^$;"'), typ))
+                self.lines.append(Line(name, path, sign.strip('/^$;"{'), typ))
 
     @cached_property
     def signatures(self) -> list[Line]:
