@@ -15,7 +15,7 @@ from django.views.generic.edit import FormView
 from web.tasks import compiler_job
 
 from .forms import SignatureChoiceForm, SignUpForm, SubmitForm
-from .models import Benchmark, Task
+from .models import Benchmark, Result, Task
 from .ops.build_tools.ctags import Ctags, MainFoundException
 from .ops.passes import Passes
 
@@ -238,8 +238,8 @@ def tasks_ready(_: HttpRequest, tid: int):
 @login_required
 def download(request: HttpRequest, bid: int):
     try:
-        b = Benchmark.objects.get(id=bid)
-    except Benchmark.DoesNotExist:
+        b = Result.objects.get(id=bid)
+    except Result.DoesNotExist:
         return redirect('list')
 
     if b.task.user != request.user:

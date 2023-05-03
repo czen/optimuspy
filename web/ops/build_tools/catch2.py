@@ -1,10 +1,11 @@
 from pathlib import Path
 
-MAKEFILE = '''OFLAGS=-O3 -march=native
+
+MAKEFILE = '''OFLAGS={}
 all: build test
 
 build:
-\tg++ $(OFLAGS) {} __optimus_tests.cpp ../../../catch2/catch_amalgamated.o -o __optimus_tests -I../../../catch2
+\t{} $(OFLAGS) {} __optimus_tests.cpp ../../../catch2/catch_amalgamated_{}.o -o __optimus_tests -I../../../catch2
 
 test:
 \t./__optimus_tests --benchmark-samples {} --out __optimus_tests.txt

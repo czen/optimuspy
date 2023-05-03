@@ -34,14 +34,14 @@ class Passes(Enum):
     NoOptPass = 0
     OMPPass = 1
 
-    @staticmethod
-    def get(ind: int, default=None) -> Pass:
-        match ind:
-            case 0:
+    @property
+    def obj(self) -> Pass | None:
+        match self:
+            case Passes.NoOptPass:
                 return Pass
-            case 1:
+            case Passes.OMPPass:
                 return OMPPass
-        return default
+        return None
 
     def __str__(self) -> str:
         return super().__str__().split('.')[-1]

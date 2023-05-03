@@ -8,7 +8,7 @@ from celery.utils.log import get_logger
 
 from optimuspy import celery_app
 
-from .models import Task, Benchmark
+from .models import Task, Result
 from .ops.build_tools import catch2
 from .ops.passes import Pass, Passes
 
@@ -34,7 +34,7 @@ def compiler_job(task_id: int):
 
     for i in range(len(Passes)):
         try:
-            b = Benchmark(task=task, num=i)
+            b = Result(task=task, num=i)
             b.save()
 
             # Create benchmark directory
@@ -46,7 +46,7 @@ def compiler_job(task_id: int):
                 shutil.copy(file, subdir)
 
             # Run opsc pass
-            p: Pass = Passes.get(i)(subdir.iterdir())
+            p: Pass = Passes(i).obj(subdir.iterdir())
             if p.run() != 0:
                 b.error = True
 

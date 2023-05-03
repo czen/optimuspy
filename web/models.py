@@ -32,11 +32,9 @@ class Task(models.Model):
         rmtree(self.path)
 
 
-class Benchmark(models.Model):
+class Result(models.Model):
     task = models.ForeignKey(Task, on_delete=models.CASCADE)
     num = models.PositiveIntegerField(null=True)
-    value = models.FloatField(null=True)
-    unit = models.CharField(max_length=4)
     error = models.BooleanField(default=False)
 
     @cached_property
@@ -46,3 +44,12 @@ class Benchmark(models.Model):
     @cached_property
     def text(self):
         return Passes(self.num).to_str()
+
+
+class Benchmark(models.Model):
+    task = models.ForeignKey(Task, on_delete=models.CASCADE)
+    value = models.FloatField(null=True)
+    unit = models.CharField(max_length=4)
+    error = models.BooleanField(default=False)
+    compiler = models.CharField(max_length=16)
+    flags = models.CharField(max_length=32)
