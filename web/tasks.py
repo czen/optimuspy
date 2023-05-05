@@ -1,15 +1,17 @@
 import shutil
 import subprocess as sp
+import tarfile
 from os import chdir, getcwd
 from pathlib import Path
-import tarfile
 
 from celery.utils.log import get_logger
+from django.conf import settings
 
 from optimuspy import celery_app
 
-from .models import Task, Result
+from .models import Benchmark, Result, Task
 from .ops.build_tools import catch2
+from .ops.compilers import Compiler, Compilers
 from .ops.passes import Pass, Passes
 
 logger = get_logger(__name__)
@@ -34,10 +36,11 @@ def compiler_job(task_id: int):
 
     for i in range(len(Passes)):
         try:
-            b = Result(task=task, num=i)
-            b.save()
+            # Create new result
+            r = Result(task=task, num=i)
+            r.save()
 
-            # Create benchmark directory
+            # Create result directory
             subdir = path / str(i)
             subdir.mkdir()
 
@@ -48,44 +51,61 @@ def compiler_job(task_id: int):
             # Run opsc pass
             p: Pass = Passes(i).obj(subdir.iterdir())
             if p.run() != 0:
-                b.error = True
+                r.error = True
+                r.save()
 
-            # Create all necessary build files
-            catch2.setup(subdir, c_files, task.f_name, task.f_sign, task.tests)  # <-
+            # For every compiler enabled
+            for comps in settings.COMPILERS:
+                comps: Compilers
+                # Get compiler object from enum
+                comp: Compiler = comps.obj
+                # For every cflags in compiler's preset
+                for cf in comp.cflags:
+                    try:
+                        # Create new benchmark
+                        b = Benchmark(task=task, pas=i, compiler=comps.value, cflags=cf.name)
+                        b.save()
 
-            cwd = getcwd()
-            try:
-                chdir(subdir)
+                        # Create all necessary build files
+                        catch2.setup(subdir, c_files, task, comp, cf)
 
-                # Run build and test routines
-                ps = sp.run(['make'], check=False)
+                        cwd = getcwd()
+                        try:
+                            chdir(subdir)
 
-            except Exception as e2:
-                logger.info(e2)
-                b.error = True
-                b.save()
+                            # Run build and test routines
+                            ps = sp.run(['make'], check=True)
 
-            finally:
-                chdir(cwd)
+                        except Exception as e2:
+                            logger.info(e2)
+                            b.error = True
+                            b.save()
 
-            # Parse benchmark results
-            v, u = catch2.parse_benchmark(subdir)
+                        finally:
+                            chdir(cwd)
 
-            # Check for parsing errors
-            if u == 'err':
-                b.error = True
+                        # Parse benchmark results
+                        v, u = catch2.parse_benchmark(subdir)
 
-            # Assign benchmark results
-            b.value = v
-            b.unit = u
+                        # Check for parsing errors
+                        if u == 'err':
+                            b.error = True
 
-            b.save()
+                        # Assign benchmark results
+                        b.value = v
+                        b.unit = u
+                        b.save()
 
-            logger.info('benchmark %d exit code: %s', i, ps.returncode)
+                        logger.info('benchmark %d exit code: %s', b.id, ps.returncode)
 
-            # Cleanup and package
-            catch2.cleanup(subdir, files)
+                        # Cleanup
+                        catch2.cleanup(subdir, files)
+                    except Exception as e3:
+                        logger.info(e3)
+                        b.error = True
+                        b.save()
 
+            # Package optimized sources
             cwd = getcwd()
             try:
                 chdir(subdir)
@@ -96,17 +116,17 @@ def compiler_job(task_id: int):
 
                 for file in files2:
                     file.unlink()
-            except Exception as e2:
-                logger.info(e2)
-                b.error = True
-                b.save()
+            except Exception as e3:
+                logger.info(e3)
+                r.error = True
+                r.save()
             finally:
                 chdir(cwd)
 
         except Exception as e:
             logger.error(e)
-            b.error = True
-            b.save()
+            r.error = True
+            r.save()
 
     # Cleanup task root dir
     for file in files:

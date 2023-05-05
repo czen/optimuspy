@@ -14,6 +14,8 @@ from pathlib import Path
 
 from decouple import config
 
+from web.ops.compilers import Compilers
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -147,6 +149,6 @@ TASKS_PATH = Path('tasks/')
 
 CELERY_BROKER_URL = 'amqp://guest@localhost'
 
-TEST_UTIL = Path('catch2/optimuspy_tests.exe')
-
 OPSC_PATH = (BASE_DIR / 'opsc').resolve()
+
+COMPILERS = [Compilers.GCC]

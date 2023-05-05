@@ -33,6 +33,7 @@ class Task(models.Model):
 
 
 class Result(models.Model):
+    id: int
     task = models.ForeignKey(Task, on_delete=models.CASCADE)
     num = models.PositiveIntegerField(null=True)
     error = models.BooleanField(default=False)
@@ -43,13 +44,15 @@ class Result(models.Model):
 
     @cached_property
     def text(self):
-        return Passes(self.num).to_str()
+        return Passes(self.num).desc
 
 
 class Benchmark(models.Model):
+    id: int
     task = models.ForeignKey(Task, on_delete=models.CASCADE)
+    pas = models.PositiveSmallIntegerField(null=True)
     value = models.FloatField(null=True)
     unit = models.CharField(max_length=4)
     error = models.BooleanField(default=False)
-    compiler = models.CharField(max_length=16)
-    flags = models.CharField(max_length=32)
+    compiler = models.PositiveSmallIntegerField(null=True)
+    cflags = models.CharField(max_length=4)

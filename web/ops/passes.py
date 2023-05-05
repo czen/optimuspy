@@ -44,9 +44,10 @@ class Passes(Enum):
         return None
 
     def __str__(self) -> str:
-        return super().__str__().split('.')[-1]
+        return self.name
 
-    def to_str(self) -> str:
+    @property
+    def desc(self) -> str:
         match self:
             case Passes.NoOptPass:
                 return 'Без оптимизации'

@@ -17,6 +17,7 @@ from web.tasks import compiler_job
 from .forms import SignatureChoiceForm, SignUpForm, SubmitForm
 from .models import Benchmark, Result, Task
 from .ops.build_tools.ctags import Ctags, MainFoundException
+from .ops.compilers import Compiler, Compilers, GenericCflags
 from .ops.passes import Passes
 
 # Create your views here.
@@ -189,19 +190,39 @@ def tasks_result(request: HttpRequest, tid: int):
         return redirect('list')
 
     if task.ready:
-        q = list(Benchmark.objects.filter(task=task))
+        q1 = list(Benchmark.objects.filter(task=task))
+        q2 = list(Result.objects.filter(task=task))
+
+        _x = []
+        _cflags = []
+        _comps = []
+        _pass = []
+        for b in q1:
+            comp: Compiler = Compilers(b.compiler).obj
+            cflags: GenericCflags = comp.cflags[b.cflags]
+            pas = Passes(b.pas)
+            _cflags.append(cflags.value)
+            _comps.append(comp.name)
+            _pass.append(pas.name)
+            _x.append(f'{comp.name} {cflags}\n{pas.desc}')
 
         data = ColumnDataSource(data={
-            'x': [Passes(i).to_str() for i in range(len(Passes))],
-            'y': [b.value for b in q],
-            'time': [b.value for b in q],
-            'unit': [b.unit for b in q],
-            'color': ['blue' if not b.error else 'red' for b in q],
+            'x': _x,
+            'y': [b.value for b in q1],
+            'time': [b.value for b in q1],
+            'unit': [b.unit for b in q1],
+            'cflags': _cflags,
+            'comps': _comps,
+            'pass': _pass,
+            'color': ['blue' if not b.error else 'red' for b in q1],
         })
 
         hover = HoverTool(
             tooltips=[
-                ('time', '@time @unit')
+                ('time', '@time @unit'),
+                ('compiler', '@comps'),
+                ('cflags', '@cflags'),
+                ('ops', '@pass')
             ]
         )
 
@@ -213,10 +234,13 @@ def tasks_result(request: HttpRequest, tid: int):
 
         script, div = components(plot)
 
+        _d = [r for r in q2 if not r.error]
+
         context = {
             'username': request.user.username,
             'script': script, 'div': div,
-            'downloads': [b for b in q if not b.error]
+            'downloads': _d,
+            'status': 'Загрузки' if _d else 'Ошибка оптимизации'
         }
         return render(request, 'web/result_ready.html', context=context)
     else:

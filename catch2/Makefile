@@ -1,4 +1,9 @@
-OFLAGS=-O3 -march=native
+CFLAGS=-O3 -march=native
 
-all:
-	g++ $(OFLAGS) -c catch_amalgamated.cpp -o catch_amalgamated.o
+all: gpp
+
+gpp:
+	g++ $(CFLAGS) -c catch_amalgamated.cpp -o catch_amalgamated_g++.o
+
+clang:
+	clang++ $(CFLAGS) -c catch_amalgamated.cpp -o catch_amalgamated_clang++.o

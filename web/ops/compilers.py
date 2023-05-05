@@ -1,23 +1,38 @@
-from abc import ABC, abstractmethod
+from abc import ABCMeta, abstractmethod
 from enum import Enum
 
 
-def singleton(cls):
+class Singleton(ABCMeta):
     _instances = {}
 
-    def getinstance(*args, **kwargs):
-        if cls not in _instances:
-            _instances[cls] = cls(*args, **kwargs)
-        return _instances[cls]
-    return getinstance
+    def __call__(cls, *args, **kwargs):
+        if cls not in cls._instances:
+            cls._instances[cls] = super(Singleton, cls).__call__(*args, **kwargs)
+        # else:
+            # cls._instances[cls].__init__(*args, **kwargs)
+        return cls._instances[cls]
 
 
-class Compiler(ABC):
-    class olevels(Enum):
-        L0: str = '-O0 -march=native'
-        L1: str = '-O1 -march=native'
-        L2: str = '-O2 -march=native'
-        L3: str = '-O2 -march=native'
+class GenericCflags(Enum):
+    def __str__(self) -> str:
+        return self.name
+
+
+class GCCCflags(GenericCflags):
+    O0 = '-O0 -march=native'
+    O1 = '-O1 -march=native'
+    O2 = '-O2 -march=native'
+    O3 = '-O3 -march=native'
+
+
+class MSVCCflags(GenericCflags):
+    O0 = '/O0 /arch:AVX2'
+    O1 = '/O1 /arch:AVX2'
+    O2 = '/O2 /arch:AVX2'
+
+
+class Compiler(metaclass=Singleton):
+    cflags = GCCCflags
     out: str = '-o'
 
     @property
@@ -25,31 +40,21 @@ class Compiler(ABC):
     def name(self):
         ...
 
-    def __iter__(self):
-        for l in self.olevels:
-            yield l.value
 
-
-@singleton
 class GCC(Compiler):
     @property
     def name(self):
         return 'g++'
 
 
-@singleton
 class Clang(Compiler):
     @property
     def name(self):
         return 'clang++'
 
 
-@singleton
 class MSVC(Compiler):
-    class olevels(Enum):
-        L0: str = '/O0 /arch:AVX2'
-        L1: str = '/O1 /arch:AVX2'
-        L2: str = '/O2 /arch:AVX2'
+    cflags = MSVCCflags
     out: str = '/Fe:'
 
     @property
@@ -60,7 +65,7 @@ class MSVC(Compiler):
 class Compilers(Enum):
     GCC = 0
     Clang = 1
-    # MSVC = 2
+    MSVC = 2
 
     @property
     def obj(self) -> Compiler | None:
@@ -69,6 +74,6 @@ class Compilers(Enum):
                 return GCC()
             case Compilers.Clang:
                 return Clang()
-            # case Compilers.MSVC:
-            #     return MSVC()
+            case Compilers.MSVC:
+                return MSVC()
         return None

@@ -1,15 +1,8 @@
 from pathlib import Path
 
+from web.models import Task
 
-MAKEFILE = '''OFLAGS={}
-all: build test
-
-build:
-\t{} $(OFLAGS) {} __optimus_tests.cpp ../../../catch2/catch_amalgamated_{}.o -o __optimus_tests -I../../../catch2
-
-test:
-\t./__optimus_tests --benchmark-samples {} --out __optimus_tests.txt
-'''
+from ..compilers import Compiler, GenericCflags
 
 TESTS = '''#include "../../../catch2/catch_amalgamated.hpp"
 #include "__optimus_debug_hook.h"
@@ -28,13 +21,25 @@ DEBUG_HOOK = '''#pragma once
 '''
 
 
-def setup(path: Path, c_files: list[Path], f_name: str, f_sign: str, tests: int):
+def setup(path: Path, c_files: list[Path], task: Task, c: Compiler, cf: GenericCflags):
     with open(path / 'Makefile', 'w', encoding='utf8') as f:
-        f.write(MAKEFILE.format(' '.join(f for f in c_files), tests))
+        f.write(  # MAKEFILE
+            f'''CFLAGS={cf.value}
+all: build test
+
+build:
+\t{c.name} $(CFLAGS) {' '.join(f for f in c_files)} __optimus_tests.cpp ../../../catch2/catch_amalgamated_{c.name}.o {c.out} __optimus_tests -I../../../catch2
+
+test:
+\t./__optimus_tests --benchmark-samples {task.tests} --out __optimus_tests.txt
+''')
+
     with open(path / '__optimus_debug_hook.h', 'w', encoding='utf8') as f:
-        f.write(DEBUG_HOOK % f_sign)
+        f.write(DEBUG_HOOK
+                % task.f_sign)
+
     with open(path / '__optimus_tests.cpp', 'w', encoding='utf8') as f:
-        f.write(TESTS % f_name)
+        f.write(TESTS % task.f_name)
 
 
 def parse_benchmark(path: Path):
