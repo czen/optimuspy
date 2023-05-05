@@ -8,11 +8,10 @@ from celery.utils.log import get_logger
 from django.conf import settings
 
 from optimuspy import celery_app
-
-from .models import Benchmark, Result, Task
-from .ops.build_tools import catch2
-from .ops.compilers import Compiler, Compilers
-from .ops.passes import Pass, Passes
+from web.models import Benchmark, Result, Task
+from web.ops.build_tools import catch2
+from web.ops.compilers import Compiler, Compilers
+from web.ops.passes import Pass, Passes
 
 logger = get_logger(__name__)
 

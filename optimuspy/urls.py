@@ -31,5 +31,6 @@ urlpatterns = [
     path('tasks/<int:tid>/result', views.tasks_result, name='result'),
     path('tasks/<int:tid>/signature/', views.tasks_signature, name='signature'),
     path('tasks/<int:tid>/ready/', views.tasks_ready, name='ready'),
-    path('download/<int:bid>/', views.download, name='download')
+    path('tasks/<int:tid>/stats/', views.tasks_stats, name='stats'),
+    path('download/<int:rid>/', views.result_download, name='download')
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

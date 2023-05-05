@@ -32,11 +32,14 @@
         <div class="mt-5 text-white text-center">
           <div class="mb-5">
             <h4>{{ status }}</h4>
+            <a role="button"
+               class="btn btn-dark btn-lg m-2 text-center"
+               href="{% url 'stats' tid=tid %}">Скачать статистику выполнения</a>
           </div>
           {% for d in downloads %}
             <a role="button"
                class="btn btn-dark btn-lg m-2 d-block text-start"
-               href="{% url 'download' bid=d.id %}">Скачать {{ d.text }}</a>
+               href="{% url 'download' rid=d.id %}">Скачать {{ d.text }}</a>
           {% endfor %}
         </div>
       </div>

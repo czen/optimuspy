@@ -2,7 +2,7 @@ from pathlib import Path
 
 from web.models import Task
 
-from ..compilers import Compiler, GenericCflags
+from web.ops.compilers import Compiler, GenericCflags
 
 TESTS = '''#include "../../../catch2/catch_amalgamated.hpp"
 #include "__optimus_debug_hook.h"

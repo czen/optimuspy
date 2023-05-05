@@ -7,7 +7,7 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import models
 
-from .ops.passes import Passes
+from web.ops.passes import Passes
 
 # Create your models here.
 

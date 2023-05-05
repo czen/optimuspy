@@ -1,4 +1,6 @@
+import csv
 from hashlib import md5
+from io import StringIO
 from pathlib import Path
 
 from bokeh.embed import components
@@ -12,13 +14,12 @@ from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
 from django.views.generic.edit import FormView
 
+from web.forms import SignatureChoiceForm, SignUpForm, SubmitForm
+from web.models import Benchmark, Result, Task
+from web.ops.build_tools.ctags import Ctags, MainFoundException
+from web.ops.compilers import Compiler, Compilers, GenericCflags
+from web.ops.passes import Passes
 from web.tasks import compiler_job
-
-from .forms import SignatureChoiceForm, SignUpForm, SubmitForm
-from .models import Benchmark, Result, Task
-from .ops.build_tools.ctags import Ctags, MainFoundException
-from .ops.compilers import Compiler, Compilers, GenericCflags
-from .ops.passes import Passes
 
 # Create your views here.
 
@@ -240,7 +241,8 @@ def tasks_result(request: HttpRequest, tid: int):
             'username': request.user.username,
             'script': script, 'div': div,
             'downloads': _d,
-            'status': 'Загрузки' if _d else 'Ошибка оптимизации'
+            'status': 'Загрузки' if _d else 'Ошибка оптимизации',
+            'tid': task.id
         }
         return render(request, 'web/result_ready.html', context=context)
     else:
@@ -260,9 +262,44 @@ def tasks_ready(_: HttpRequest, tid: int):
 
 
 @login_required
-def download(request: HttpRequest, bid: int):
+def tasks_stats(request: HttpRequest, tid: int):
     try:
-        b = Result.objects.get(id=bid)
+        task = Task.objects.get(id=tid)
+    except Task.DoesNotExist:
+        return redirect('list')
+
+    if task.f_name == '':
+        return redirect('signature', tid=task.id)
+
+    if task.user != request.user:
+        return redirect('list')
+
+    if task.ready:
+        q = list(Benchmark.objects.filter(task=task))
+
+        data = StringIO()
+        w = csv.writer(data, delimiter=';', quoting=csv.QUOTE_MINIMAL)
+        w.writerow(['Проход', 'Компилятор', 'Уровень оптимизации', 'Время',
+                    'Единица измерения', 'Флаги компилятора', 'Флаги OPS'])
+        for b in q:
+            comp: Compiler = Compilers(b.compiler).obj
+            cflags: GenericCflags = comp.cflags[b.cflags]
+            pas = Passes(b.pas)
+            row = [
+                pas.name, comp.name, cflags.name, b.value,
+                b.unit, cflags.value, ' '.join(pas.obj.args)
+            ]
+            w.writerow(row)
+
+        response = HttpResponse(data.getvalue(), content_type='text/csv; charset=utf-8-sig')
+        response['Content-Disposition'] = f'attachment; filename={task.hash}.csv'
+        return response
+
+
+@login_required
+def result_download(request: HttpRequest, rid: int):
+    try:
+        b = Result.objects.get(id=rid)
     except Result.DoesNotExist:
         return redirect('list')
 
