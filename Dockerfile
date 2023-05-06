@@ -1,4 +1,4 @@
-FROM cooliron/optimuspy
+FROM cooliron/optimuspy:clang
 
 RUN mkdir optimuspy
 COPY . optimuspy
@@ -7,7 +7,8 @@ RUN mv opsc /optimuspy/opsc
 RUN mv catch_amalgamated.cpp catch_amalgamated.hpp /optimuspy/catch2
 
 WORKDIR /optimuspy/catch2
-RUN make
+RUN make gpp
+RUN make clang
 
 WORKDIR /optimuspy
 RUN pip3 install -r requirements/prod.txt

@@ -151,4 +151,4 @@ CELERY_BROKER_URL = 'amqp://guest@localhost'
 
 OPSC_PATH = (BASE_DIR / 'opsc').resolve()
 
-COMPILERS = [Compilers.GCC]
+COMPILERS = [Compilers.GCC, Compilers.Clang]

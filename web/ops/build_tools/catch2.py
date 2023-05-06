@@ -22,6 +22,9 @@ DEBUG_HOOK = '''#pragma once
 
 
 def setup(path: Path, c_files: list[Path], task: Task, c: Compiler, cf: GenericCflags):
+    # https://learn.microsoft.com/en-us/cpp/build/reference/tc-tp-tc-tp-specify-source-file-type
+    if c.name == 'cl':
+        c_files = [f'/Tp {f}' for f in c_files]
     with open(path / 'Makefile', 'w', encoding='utf8') as f:
         f.write(  # MAKEFILE
             f'''CFLAGS={cf.value}

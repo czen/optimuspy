@@ -40,17 +40,30 @@ class Compiler(metaclass=Singleton):
     def name(self):
         ...
 
+    @property
+    @abstractmethod
+    def short(self):
+        ...
+
 
 class GCC(Compiler):
     @property
     def name(self):
         return 'g++'
 
+    @property
+    def short(self):
+        return 'g++'
+
 
 class Clang(Compiler):
     @property
     def name(self):
-        return 'clang++'
+        return 'clang++-15'
+
+    @property
+    def short(self):
+        return 'clang'
 
 
 class MSVC(Compiler):
@@ -60,6 +73,10 @@ class MSVC(Compiler):
     @property
     def name(self):
         return 'cl'
+
+    @property
+    def short(self):
+        return 'msvc'
 
 
 class Compilers(Enum):

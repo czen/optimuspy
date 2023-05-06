@@ -205,7 +205,7 @@ def tasks_result(request: HttpRequest, tid: int):
             _cflags.append(cflags.value)
             _comps.append(comp.name)
             _pass.append(pas.name)
-            _x.append(f'{comp.name} {cflags}\n{pas.short}')
+            _x.append(f'{comp.short} {cflags}\n{pas.short}')
             _y.append(b.value)
             _time.append(b.value)
             _unit.append(b.unit)
@@ -283,7 +283,7 @@ def tasks_stats(request: HttpRequest, tid: int):
         q = list(Benchmark.objects.filter(task=task))
 
         data = StringIO()
-        w = csv.writer(data, delimiter=';', quoting=csv.QUOTE_NONNUMERIC, quotechar='|')
+        w = csv.writer(data, delimiter=';', quoting=csv.QUOTE_NONNUMERIC)
         w.writerow(['Проход', 'Компилятор', 'Уровень оптимизации', 'Время',
                     'Единица измерения', 'Флаги компилятора', 'Флаги OPS', 'Вывод компилятора'])
         for b in q:
