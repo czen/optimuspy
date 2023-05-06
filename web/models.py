@@ -56,3 +56,9 @@ class Benchmark(models.Model):
     error = models.BooleanField(default=False)
     compiler = models.PositiveSmallIntegerField(null=True)
     cflags = models.CharField(max_length=4)
+
+
+class CompError(models.Model):
+    id: int
+    bench = models.ForeignKey(Benchmark, on_delete=models.CASCADE)
+    text = models.TextField(null=True)

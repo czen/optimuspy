@@ -23,12 +23,18 @@ class Pass():
 
 class OMPPass(Pass):
     '''Проход с бэкендом OpenMP'''
-    args = ['-backend=openmp']
+    args = ['-backend=openmp', '-flattice', '-fmontego']
+
+
+class TilingPass(Pass):
+    '''Проход с Tiling бэкендом'''
+    args = ['-backend=tiling', '-flattice', '-fmontego', '-rtails']
 
 
 class Passes(Enum):
     NoOptPass = 0
     OMPPass = 1
+    TilingPass = 2
 
     @property
     def obj(self) -> Pass | None:
@@ -37,6 +43,8 @@ class Passes(Enum):
                 return Pass
             case Passes.OMPPass:
                 return OMPPass
+            case Passes.TilingPass:
+                return TilingPass
         return None
 
     def __str__(self) -> str:
@@ -49,4 +57,17 @@ class Passes(Enum):
                 return 'Без оптимизации'
             case Passes.OMPPass:
                 return 'OpenMP backend'
+            case Passes.TilingPass:
+                return 'Tiling backend'
+        return super().__str__()
+
+    @property
+    def short(self):
+        match self:
+            case Passes.NoOptPass:
+                return 'NoOpt'
+            case Passes.OMPPass:
+                return 'OMP'
+            case Passes.TilingPass:
+                return 'Tiling'
         return super().__str__()

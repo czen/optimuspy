@@ -8,7 +8,7 @@ from celery.utils.log import get_logger
 from django.conf import settings
 
 from optimuspy import celery_app
-from web.models import Benchmark, Result, Task
+from web.models import Benchmark, Result, Task, CompError
 from web.ops.build_tools import catch2
 from web.ops.compilers import Compiler, Compilers
 from web.ops.passes import Pass, Passes
@@ -73,7 +73,13 @@ def compiler_job(task_id: int):
                             chdir(subdir)
 
                             # Run build and test routines
-                            ps = sp.run(['make'], check=True)
+                            ps1 = sp.run(['make', 'build'], check=False, capture_output=True)
+
+                            if ps1.returncode != 0:
+                                err = CompError(bench=b, text=ps1.stderr.decode('utf-8'))
+                                err.save()
+
+                            ps2 = sp.run(['make', 'test'], check=False)
 
                         except Exception as e2:
                             logger.info(e2)
@@ -95,7 +101,7 @@ def compiler_job(task_id: int):
                         b.unit = u
                         b.save()
 
-                        logger.info('benchmark %d exit code: %s', b.id, ps.returncode)
+                        logger.info('benchmark %d exit code: %s', b.id, ps2.returncode)
 
                         # Cleanup
                         catch2.cleanup(subdir, files)

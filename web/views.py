@@ -15,7 +15,7 @@ from django.urls import reverse_lazy
 from django.views.generic.edit import FormView
 
 from web.forms import SignatureChoiceForm, SignUpForm, SubmitForm
-from web.models import Benchmark, Result, Task
+from web.models import Benchmark, Result, Task, CompError
 from web.ops.build_tools.ctags import Ctags, MainFoundException
 from web.ops.compilers import Compiler, Compilers, GenericCflags
 from web.ops.passes import Passes
@@ -194,10 +194,10 @@ def tasks_result(request: HttpRequest, tid: int):
         q1 = list(Benchmark.objects.filter(task=task))
         q2 = list(Result.objects.filter(task=task))
 
-        _x = []
-        _cflags = []
-        _comps = []
-        _pass = []
+        _x ,_y, _time = [], [], []
+        _unit, _cflags = [], []
+        _comps, _pass = [], []
+        _col, _err = [], []
         for b in q1:
             comp: Compiler = Compilers(b.compiler).obj
             cflags: GenericCflags = comp.cflags[b.cflags]
@@ -205,17 +205,24 @@ def tasks_result(request: HttpRequest, tid: int):
             _cflags.append(cflags.value)
             _comps.append(comp.name)
             _pass.append(pas.name)
-            _x.append(f'{comp.name} {cflags}\n{pas.desc}')
+            _x.append(f'{comp.name} {cflags}\n{pas.short}')
+            _y.append(b.value)
+            _time.append(b.value)
+            _unit.append(b.unit)
+            _col.append('blue' if not b.error else 'red')
+            _e = CompError.objects.filter(bench=b).first()
+            _err.append(_e.text if _e else str(_e))
 
         data = ColumnDataSource(data={
             'x': _x,
-            'y': [b.value for b in q1],
-            'time': [b.value for b in q1],
-            'unit': [b.unit for b in q1],
+            'y': _y,
+            'time': _time,
+            'unit': _unit,
             'cflags': _cflags,
             'comps': _comps,
             'pass': _pass,
-            'color': ['blue' if not b.error else 'red' for b in q1],
+            'color': _col,
+            'err': _err
         })
 
         hover = HoverTool(
@@ -223,25 +230,23 @@ def tasks_result(request: HttpRequest, tid: int):
                 ('time', '@time @unit'),
                 ('compiler', '@comps'),
                 ('cflags', '@cflags'),
-                ('ops', '@pass')
+                ('ops', '@pass'),
+                ('error', '@err')
             ]
         )
 
         plot = figure(title=task.name, x_range=data.data['x'], sizing_mode='stretch_width')
         plot.vbar(x='x', top='y', color='color', width=0.5, source=data)
-        plot.xaxis.axis_label = 'Проход'
+        plot.xaxis.axis_label = 'Проход/компилятор'
         plot.yaxis.axis_label = 'Время работы программы'
         plot.add_tools(hover)
 
         script, div = components(plot)
 
-        _d = [r for r in q2 if not r.error]
-
         context = {
             'username': request.user.username,
             'script': script, 'div': div,
-            'downloads': _d,
-            'status': 'Загрузки' if _d else 'Ошибка оптимизации',
+            'downloads': q2,
             'tid': task.id
         }
         return render(request, 'web/result_ready.html', context=context)
@@ -278,16 +283,18 @@ def tasks_stats(request: HttpRequest, tid: int):
         q = list(Benchmark.objects.filter(task=task))
 
         data = StringIO()
-        w = csv.writer(data, delimiter=';', quoting=csv.QUOTE_MINIMAL)
+        w = csv.writer(data, delimiter=';', quoting=csv.QUOTE_NONNUMERIC, quotechar='|')
         w.writerow(['Проход', 'Компилятор', 'Уровень оптимизации', 'Время',
-                    'Единица измерения', 'Флаги компилятора', 'Флаги OPS'])
+                    'Единица измерения', 'Флаги компилятора', 'Флаги OPS', 'Вывод компилятора'])
         for b in q:
             comp: Compiler = Compilers(b.compiler).obj
             cflags: GenericCflags = comp.cflags[b.cflags]
             pas = Passes(b.pas)
+            err = CompError.objects.filter(bench=b).first()
             row = [
                 pas.name, comp.name, cflags.name, b.value,
-                b.unit, cflags.value, ' '.join(pas.obj.args)
+                b.unit, cflags.value, ' '.join(pas.obj.args),
+                err.text if err else ''
             ]
             w.writerow(row)
 
