@@ -1,6 +1,7 @@
 import csv
 from hashlib import md5
 from io import StringIO
+from math import pi
 from pathlib import Path
 
 from bokeh.embed import components
@@ -15,7 +16,7 @@ from django.urls import reverse_lazy
 from django.views.generic.edit import FormView
 
 from web.forms import SignatureChoiceForm, SignUpForm, SubmitForm
-from web.models import Benchmark, Result, Task, CompError
+from web.models import Benchmark, CompError, Result, Task
 from web.ops.build_tools.ctags import Ctags, MainFoundException
 from web.ops.compilers import Compiler, Compilers, GenericCflags
 from web.ops.passes import Passes
@@ -205,7 +206,7 @@ def tasks_result(request: HttpRequest, tid: int):
             _cflags.append(cflags.value)
             _comps.append(comp.name)
             _pass.append(pas.name)
-            _x.append(f'{comp.short} {cflags}\n{pas.short}')
+            _x.append(f'{comp.short} {cflags} {pas.short}')
             _y.append(b.value)
             _time.append(b.value)
             _unit.append(b.unit)
@@ -239,6 +240,7 @@ def tasks_result(request: HttpRequest, tid: int):
         plot.vbar(x='x', top='y', color='color', width=0.5, source=data)
         plot.xaxis.axis_label = 'Проход/компилятор'
         plot.yaxis.axis_label = 'Время работы программы'
+        plot.xaxis.major_label_orientation = pi/4
         plot.add_tools(hover)
 
         script, div = components(plot)
