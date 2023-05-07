@@ -1,4 +1,8 @@
+from crispy_forms.bootstrap import InlineCheckboxes
+from crispy_forms.helper import FormHelper
+from crispy_forms.layout import Fieldset, Layout, Submit
 from django import forms
+from django.conf import settings
 from django.contrib.auth.forms import UserCreationForm
 
 
@@ -31,8 +35,38 @@ class SignUpForm(UserCreationForm):
 
 class SubmitForm(forms.Form):
     title = forms.CharField(max_length=80, label='Имя загрузки (пустое будет заменено хешем)', required=False)
-    tests = forms.IntegerField(min_value=1, max_value=100, initial=10, label='Количество тестовых проходов')
+    tests = forms.IntegerField(min_value=1, max_value=100, initial=10, label='Число запусков программы для усреднения времени')
     files = MultipleFileField(label='Файлы')
+
+    compilers = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple, choices=[
+        (str(i.value), i.name) for i in settings.COMPILERS
+    ], label='')
+
+    passes = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple, choices=[
+        (str(i.value), i.desc) for i in settings.OPS_PASSES
+    ], label='')
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.layout = Layout(
+            'title',
+            'tests',
+            'files',
+            Fieldset(
+                'Компиляторы',
+                InlineCheckboxes(
+                    'compilers'
+                ),
+            ),
+            Fieldset(
+                'Проходы',
+                InlineCheckboxes(
+                    'passes'
+                ),
+            ),
+            Submit('submit', 'Отправить', css_class='btn btn-dark btn-lg mt-2'),
+        )
 
 
 class SignatureChoiceForm(forms.Form):

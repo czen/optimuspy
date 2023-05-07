@@ -15,6 +15,7 @@ from pathlib import Path
 from decouple import config
 
 from web.ops.compilers import Compilers
+from web.ops.passes import Passes
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -28,7 +29,7 @@ SECRET_KEY = config('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -152,3 +153,5 @@ CELERY_BROKER_URL = 'amqp://guest@localhost'
 OPSC_PATH = (BASE_DIR / 'opsc').resolve()
 
 COMPILERS = [Compilers.GCC, Compilers.Clang]
+
+OPS_PASSES = [Passes.NoOptPass, Passes.OMPPass, Passes.TilingPass]

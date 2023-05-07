@@ -14,7 +14,6 @@ from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
 from django.views.generic.edit import FormView
-
 from web.forms import SignatureChoiceForm, SignUpForm, SubmitForm
 from web.models import Benchmark, CompError, Result, Task
 from web.ops.build_tools.ctags import Ctags, MainFoundException

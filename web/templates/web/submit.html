@@ -26,8 +26,7 @@
           <h2 class="lab">Отправка</h2>
           <form method="post" enctype="multipart/form-data" class="form">
             {% csrf_token %}
-            {{ form|crispy }}
-            <button type="submit" class="btn btn-dark btn-lg btn-m">Отправить</button>
+            {% crispy form %}
           </form>
         </div>
         <div class="hoverable mt-5">
