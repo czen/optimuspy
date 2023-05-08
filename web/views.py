@@ -55,7 +55,7 @@ class SignUp(FormView):
     redirect_authenticated_user = True
     success_url = reverse_lazy('list')
 
-    def form_valid(self, form) -> HttpResponse:
+    def form_valid(self, form: SignUpForm) -> HttpResponse:
         user = form.save()
 
         if user is not None:

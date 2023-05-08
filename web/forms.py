@@ -4,7 +4,7 @@ from crispy_forms.layout import Fieldset, Layout, Submit
 from django import forms
 from django.conf import settings
 from django.contrib.auth.forms import UserCreationForm
-from web.ops.compilers import SubmitFormCflags, Compilers
+from web.ops.compilers import SubmitFormCflags
 from web.ops.passes import Passes
 from web.models import User, Task
 
@@ -29,11 +29,16 @@ class MultipleFileField(forms.FileField):
 
 
 class SignUpForm(UserCreationForm):
+    email = forms.EmailField(label='Адрес электронной почты', required=True)
 
     def __init__(self, *args, **kwargs):
         super(UserCreationForm, self).__init__(*args, **kwargs)
-        for name in ('username', 'password1', 'password2'):
+        for name in ('username', 'email', 'password1', 'password2'):
             self.fields[name].help_text = None
+
+    class Meta:
+        model = User
+        fields = ('username', 'email', 'password1', 'password2')
 
 
 class SubmitForm(forms.Form):
