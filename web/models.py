@@ -14,6 +14,8 @@ from web.ops.passes import Passes
 
 # Create your models here.
 
+# pylint: disable=unused-argument
+
 
 class API(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -21,14 +23,14 @@ class API(models.Model):
 
 
 @receiver(si.post_save, sender=User)
-def create_user_API(_, instance, created, **kwargs):
+def create_user_API(sender, instance, created, **kwargs):
     if created:
         API.objects.create(user=instance)
 
 
 @receiver(si.post_save, sender=User)
-def save_user_API(_, instance, **kwargs):
-    instance.api.key = md5(instance.login + settings.SECRET_KEY).hexdigest()
+def save_user_API(sender, instance, **kwargs):
+    instance.api.key = md5((instance.username + settings.SECRET_KEY).encode('utf-8')).hexdigest()
     instance.api.save()
 
 

@@ -33,7 +33,7 @@ def compiler_job(task_id: int):
     # Filter sources only
     c_files = [f.name for f in files if f.name.endswith('.c')]
 
-    for i in range(len(Passes)):
+    for i in task.passes:
         try:
             # Create new result
             r = Result(task=task, num=i)
@@ -48,21 +48,24 @@ def compiler_job(task_id: int):
                 shutil.copy(file, subdir)
 
             # Run opsc pass
-            p: Pass = Passes(i).obj(subdir.iterdir())
-            if p.run() != 0:
+            _p = Passes(i)
+            p: Pass = _p.obj(subdir.iterdir())
+            _ret = p.run()
+            logger.info('%s finished with code %d', _p.name, _ret)
+            if _ret != 0:
                 r.error = True
                 r.save()
 
             # For every compiler enabled
-            for comps in settings.COMPILERS:
-                comps: Compilers
+            for comps in task.compilers:
                 # Get compiler object from enum
-                comp: Compiler = comps.obj
+                comp: Compiler = Compilers(comps).obj
                 # For every cflags in compiler's preset
-                for cf in comp.cflags:
+                for _cf in sorted(set(task.cflags) & set(fl.name for fl in comp.cflags)):
                     try:
+                        cf = comp.cflags[_cf]
                         # Create new benchmark
-                        b = Benchmark(task=task, pas=i, compiler=comps.value, cflags=cf.name)
+                        b = Benchmark(task=task, pas=i, compiler=comps, cflags=cf.name)
                         b.save()
 
                         # Create all necessary build files
@@ -101,7 +104,7 @@ def compiler_job(task_id: int):
                         b.unit = u
                         b.save()
 
-                        logger.info('benchmark %d exit code: %s', b.id, ps2.returncode)
+                        logger.info('benchmark %d exit code: %d', b.id, ps2.returncode)
 
                         # Cleanup
                         catch2.cleanup(subdir, files)
