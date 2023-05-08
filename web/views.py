@@ -84,13 +84,18 @@ def tasks_list(request: HttpRequest):
 @login_required
 def tasks_submit(request: HttpRequest):
     if request.method == 'POST':
-        form = SubmitForm(request.POST, request.FILES)
+        form = SubmitForm(request.user, request.POST, request.FILES)
         if form.is_valid():
             task = handle_upload(request)
 
             if task is None:
                 request.session['msg'] = 'Отправка отменена из-за несоотвествием требованиям'
                 return redirect('list')
+
+            task.compilers = form.cleaned_data['compilers']
+            task.cflags = form.cleaned_data['cflags']
+            task.passes = form.cleaned_data['passes']
+            task.save()
 
             if task.f_name == '':
                 return redirect('signature', tid=task.id)
@@ -99,7 +104,7 @@ def tasks_submit(request: HttpRequest):
                 compiler_job.delay(task.id)
             return redirect('list')
     else:
-        form = SubmitForm()
+        form = SubmitForm(request.user)
     return render(request, 'web/submit.html', {'form': form})
 
 

@@ -4,6 +4,9 @@ from crispy_forms.layout import Fieldset, Layout, Submit
 from django import forms
 from django.conf import settings
 from django.contrib.auth.forms import UserCreationForm
+from web.ops.compilers import SubmitFormCflags, Compilers
+from web.ops.passes import Passes
+from web.models import User, Task
 
 
 class MultipleFileInput(forms.ClearableFileInput):
@@ -42,12 +45,21 @@ class SubmitForm(forms.Form):
         (str(i.value), i.name) for i in settings.COMPILERS
     ], label='')
 
+    cflags = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple, choices=[
+        (i.name, i.name) for i in SubmitFormCflags
+    ], label='')
+
     passes = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple, choices=[
         (str(i.value), i.desc) for i in settings.OPS_PASSES
     ], label='')
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, u: User, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        task = Task.objects.filter(user=u).last()
+        if task:
+            self.fields['compilers'].initial = [str(i) for i in task.compilers]
+            self.fields['cflags'].initial = task.cflags
+            self.fields['passes'].initial = [str(Passes(i).value) for i in task.passes]
         self.helper = FormHelper()
         self.helper.layout = Layout(
             'title',
@@ -60,12 +72,18 @@ class SubmitForm(forms.Form):
                 ),
             ),
             Fieldset(
+                'Уровни оптимизации',
+                InlineCheckboxes(
+                    'cflags'
+                ),
+            ),
+            Fieldset(
                 'Проходы',
                 InlineCheckboxes(
                     'passes'
                 ),
             ),
-            Submit('submit', 'Отправить', css_class='btn btn-dark btn-lg mt-2'),
+            Submit('submit', 'Отправить', css_class='btn btn-dark btn-lg mt-3'),
         )
 
 

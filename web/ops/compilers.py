@@ -18,6 +18,14 @@ class GenericCflags(Enum):
         return self.name
 
 
+class SubmitFormCflags(Enum):
+    """Maximum number of cflags options used in submit form"""
+    O0 = 0
+    O1 = 1
+    O2 = 2
+    O3 = 3
+
+
 class GCCCflags(GenericCflags):
     O0 = '-O0 -march=native'
     O1 = '-O1 -march=native'

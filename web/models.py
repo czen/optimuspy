@@ -1,4 +1,5 @@
 from functools import cached_property
+from hashlib import md5
 from pathlib import Path
 from shutil import rmtree
 
@@ -6,13 +7,33 @@ from django.conf import settings
 # pylint: disable=imported-auth-user
 from django.contrib.auth.models import User
 from django.db import models
+from django.db.models import signals as si
+from django.dispatch import receiver
 
 from web.ops.passes import Passes
 
 # Create your models here.
 
 
+class API(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    key = models.CharField(max_length=32)
+
+
+@receiver(si.post_save, sender=User)
+def create_user_API(_, instance, created, **kwargs):
+    if created:
+        API.objects.create(user=instance)
+
+
+@receiver(si.post_save, sender=User)
+def save_user_API(_, instance, **kwargs):
+    instance.api.key = md5(instance.login + settings.SECRET_KEY).hexdigest()
+    instance.api.save()
+
+
 class Task(models.Model):
+    SEP = '|'
     id: int
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=80)
@@ -23,6 +44,39 @@ class Task(models.Model):
     date = models.DateTimeField(auto_now_add=True)
     tests = models.PositiveSmallIntegerField()
     ready = models.BooleanField(default=False)
+    _compilers = models.CharField(max_length=32)
+    _cflags = models.CharField(max_length=32)
+    _passes = models.CharField(max_length=32)
+
+    @property
+    def compilers(self):
+        return list(map(int, self._compilers.split(self.SEP)))
+
+    @compilers.setter
+    def compilers(self, data: list[str]):
+        if not isinstance(data, list):
+            raise ValueError
+        self._compilers = self.SEP.join(data)
+
+    @property
+    def cflags(self):
+        return list(self._cflags.split(self.SEP))
+
+    @cflags.setter
+    def cflags(self, data: list[str]):
+        if not isinstance(data, list):
+            raise ValueError
+        self._cflags = self.SEP.join(data)
+
+    @property
+    def passes(self):
+        return list(map(int, self._passes.split(self.SEP)))
+
+    @passes.setter
+    def passes(self, data: list[str]):
+        if not isinstance(data, list):
+            raise ValueError
+        self._passes = self.SEP.join(data)
 
     def mkdir(self) -> None:
         self.path = settings.TASKS_PATH / str(self.id)
