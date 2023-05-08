@@ -152,6 +152,20 @@ CELERY_BROKER_URL = 'amqp://guest@localhost'
 
 OPSC_PATH = (BASE_DIR / 'opsc').resolve()
 
-COMPILERS = [Compilers.GCC, Compilers.Clang]
+# -----------
+# Компиляторы
+# -----------
+COMPILERS = [
+    Compilers.GCC, Compilers.Clang
+    ]
+if not COMPILERS:
+    raise Warning('You have to choose at least one compiler')
 
-OPS_PASSES = [Passes.NoOptPass, Passes.OMPPass, Passes.TilingPass]
+# -----------
+# Проходы OPS
+# -----------
+OPS_PASSES = [
+    Passes.NoOptPass, Passes.OMPPass, Passes.TilingPass
+    ]
+if not OPS_PASSES:
+    raise Warning('You have to choose at least one pass')
