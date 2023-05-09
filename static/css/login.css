@@ -1,8 +1,8 @@
 html,
 body {
     height: 100%;
-    padding-left: 10%;
-    padding-right: 10%;
+    padding-left: 5%;
+    padding-right: 5%;
     background-color: black;
     background-image: url("../images/bg.gif");
     background-size: 30%;
