@@ -5,7 +5,6 @@ from os import chdir, getcwd
 from pathlib import Path
 
 from celery.utils.log import get_logger
-from django.conf import settings
 
 from optimuspy import celery_app
 from web.models import Benchmark, Result, Task, CompError

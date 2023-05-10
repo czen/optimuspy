@@ -146,11 +146,15 @@ CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 
 CRISPY_TEMPLATE_PACK = "bootstrap5"
 
+# Custom test runner to do testing on live database :P
+TEST_RUNNER='web.tests.ProductionDBTestRunner'
+
 TASKS_PATH = Path('tasks/')
 
 CELERY_BROKER_URL = 'amqp://guest@localhost'
 
 OPSC_PATH = (BASE_DIR / 'opsc').resolve()
+
 
 # -----------
 # Компиляторы
@@ -169,3 +173,5 @@ OPS_PASSES = [
     ]
 if not OPS_PASSES:
     raise Warning('You have to choose at least one pass')
+
+
