@@ -1,6 +1,6 @@
-from web.models import User
-
 from django.core.management.base import BaseCommand
+
+from web.models import User
 
 
 class Command(BaseCommand):

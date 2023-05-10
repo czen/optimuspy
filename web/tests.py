@@ -1,4 +1,5 @@
 import requests
+from django.conf import settings
 from django.test import TestCase
 
 # Create your tests here.
@@ -55,3 +56,19 @@ class AuthTests(TestCase):
             self.assertEqual(json['status'], 'success')
         except requests.Timeout:
             self.fail('timeout')
+
+
+class CompilersTests(TestCase):
+    def test_compilers(self):
+        r = requests.post('http://localhost:8000/api/compilers/', timeout=60)
+        json = r.json()
+        self.assertFalse(json['error'])
+        self.assertEqual(json['compilers'], [c.name for c in settings.COMPILERS])
+
+
+class PassesTests(TestCase):
+    def test_passes(self):
+        r = requests.post('http://localhost:8000/api/passes/', timeout=60)
+        json = r.json()
+        self.assertFalse(json['error'])
+        self.assertEqual(json['passes'], [p.name for p in settings.OPS_PASSES])

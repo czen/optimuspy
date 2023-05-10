@@ -8,6 +8,7 @@ from pathlib import Path
 from bokeh.embed import components
 from bokeh.models import ColumnDataSource, HoverTool
 from bokeh.plotting import figure
+from django.conf import settings
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import LoginView
@@ -341,10 +342,10 @@ def api_auth(request: HttpRequest):
         'token': ''
     }
     req: dict = json.loads(request.body)
-    unam, pwd = req.get('username'), req.get('password')
-    if unam and pwd:
+    uname, pwd = req.get('username'), req.get('password')
+    if uname and pwd:
         try:
-            user = User.objects.get(username=unam)
+            user = User.objects.get(username=uname)
         except User.DoesNotExist:
             resp['status'] = 'user does not exist'
         else:
@@ -357,6 +358,26 @@ def api_auth(request: HttpRequest):
     else:
         resp['status'] = 'invalid parameters'
 
+    return JsonResponse(resp)
+
+
+@csrf_exempt
+def api_compilers(request: HttpRequest):
+    resp = {
+        'error': False,
+        'status': 'success',
+        'compilers': [c.name for c in settings.COMPILERS]
+    }
+    return JsonResponse(resp)
+
+
+@csrf_exempt
+def api_passes(request: HttpRequest):
+    resp = {
+        'error': False,
+        'status': 'success',
+        'passes': [p.name for p in settings.OPS_PASSES]
+    }
     return JsonResponse(resp)
 
 
