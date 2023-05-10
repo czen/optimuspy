@@ -24,7 +24,7 @@
     function get_results() {
       $.ajax({
           type: 'GET',
-          url: "/tasks/{{ tid }}/ready",
+          url: "/tasks/{{ th }}/ready",
           success: function (json) {
               if (json.ready)
                   location.reload();

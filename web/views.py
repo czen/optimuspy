@@ -19,7 +19,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.generic.edit import FormView
 
 from web.forms import SignatureChoiceForm, SignUpForm, SubmitForm
-from web.models import Benchmark, CompError, Result, Task, User
+from web.models import API, Benchmark, CompError, Result, Task, User
 from web.ops.build_tools.ctags import Ctags, MainFoundException
 from web.ops.compilers import Compiler, Compilers, GenericCflags
 from web.ops.passes import Passes
@@ -102,7 +102,7 @@ def tasks_submit(request: HttpRequest):
             task.save()
 
             if task.f_name == '':
-                return redirect('signature', tid=task.id)
+                return redirect('signature', th=task.hash)
             else:
                 request.session['msg'] = 'Отправлено'
                 compiler_job.delay(task.id)
@@ -113,9 +113,9 @@ def tasks_submit(request: HttpRequest):
 
 
 @login_required
-def tasks_signature(request: HttpRequest, tid: int):
+def tasks_signature(request: HttpRequest, th: str):
     try:
-        task = Task.objects.get(id=tid)
+        task = Task.objects.get(hash=th)
     except Task.DoesNotExist:
         return redirect('submit')
 
@@ -148,7 +148,7 @@ def tasks_signature(request: HttpRequest, tid: int):
 
 
 def md5sum(path: Path, chunk_size: int = 4096) -> str:
-    hasher = md5()
+    hasher = md5(str(path).encode('utf-8'))
     for file in path.iterdir():
         with open(file, 'rb') as f:
             while chunk := f.read(chunk_size):
@@ -187,14 +187,14 @@ def handle_upload(request: HttpRequest) -> Task | None:
 
 
 @login_required
-def tasks_result(request: HttpRequest, tid: int):
+def tasks_result(request: HttpRequest, th: str):
     try:
-        task = Task.objects.get(id=tid)
+        task = Task.objects.get(hash=th)
     except Task.DoesNotExist:
         return redirect('list')
 
     if task.f_name == '':
-        return redirect('signature', tid=task.id)
+        return redirect('signature', th=task.hash)
 
     if task.user != request.user:
         return redirect('list')
@@ -257,34 +257,34 @@ def tasks_result(request: HttpRequest, tid: int):
             'username': request.user.username,
             'script': script, 'div': div,
             'downloads': q2,
-            'tid': task.id
+            'th': task.hash
         }
         return render(request, 'web/result_ready.html', context=context)
     else:
         context = {
-            'tid': task.id,
+            'th': task.hash,
             'timeout': 10000
         }
         return render(request, 'web/result_wait.html', context=context)
 
 
-def tasks_ready(_: HttpRequest, tid: int):
+def tasks_ready(_: HttpRequest, th: str):
     try:
-        task = Task.objects.get(id=tid)
+        task = Task.objects.get(hash=th)
         return JsonResponse({'ready': task.ready})
     except Task.DoesNotExist:
         return JsonResponse({'ready': False})
 
 
 @login_required
-def tasks_stats(request: HttpRequest, tid: int):
+def tasks_stats(request: HttpRequest, th: str):
     try:
-        task = Task.objects.get(id=tid)
+        task = Task.objects.get(hash=th)
     except Task.DoesNotExist:
         return redirect('list')
 
     if task.f_name == '':
-        return redirect('signature', tid=task.id)
+        return redirect('signature', th=task.hash)
 
     if task.user != request.user:
         return redirect('list')
@@ -338,7 +338,7 @@ def result_download(request: HttpRequest, rid: int):
 def api_auth(request: HttpRequest):
     resp = {
         'error': True,
-        'status': '',
+        'status': 'success',
         'token': ''
     }
     req: dict = json.loads(request.body)
@@ -351,7 +351,6 @@ def api_auth(request: HttpRequest):
         else:
             if user.check_password(pwd):
                 resp['error'] = False
-                resp['status'] = 'success'
                 resp['token'] = user.api.key
             else:
                 resp['status'] = 'invalid password'
@@ -379,6 +378,29 @@ def api_passes(request: HttpRequest):
         'passes': [p.name for p in settings.OPS_PASSES]
     }
     return JsonResponse(resp)
+
+
+@csrf_exempt
+def api_tasks(request: HttpRequest):
+    resp = {
+        'error': True,
+        'status': 'success',
+        'tasks': []
+    }
+    req: dict = json.loads(request.body)
+    token = req.get('token')
+
+    user: User = None
+    try:
+        user = API.objects.get(key=token).user
+    except API.DoesNotExist:
+        resp['status'] = 'invalid token'
+        return resp
+
+    resp['tasks'] = [t.hash for t in Task.objects.filter(user=user)]
+    resp['status'] = 'success'
+    resp['error'] = False
+    return resp
 
 
 @csrf_exempt

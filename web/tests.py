@@ -5,15 +5,18 @@ from django.test.runner import DiscoverRunner
 
 # Create your tests here.
 
-# pylint: disable=import-outside-toplevel
+# pylint: disable=import-outside-toplevel, global-statement
 
 import django
 django.setup()
 
+TOKEN: str = None
 
 def setUpModule():
+    global TOKEN
     from web.models import User
-    User.objects.create_user(username='unittest', password='123')
+    u = User.objects.create_user(username='unittest', password='123')
+    TOKEN = u.api.key
 
 
 def tearDownModule():
@@ -80,6 +83,7 @@ class AuthTests(TestCase):
             json = r.json()
             self.assertFalse(json['error'])
             self.assertEqual(json['status'], 'success')
+            self.assertEqual(json['token'], TOKEN)
         except requests.Timeout:
             self.fail('timeout')
 

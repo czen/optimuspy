@@ -27,7 +27,7 @@
           {% for task in tasks %}
             <a role="button"
                class="btn btn-dark btn-lg m-2 d-block text-start"
-               href="{% url 'result' tid=task.id %}">{{ task.date|date:'d M Y H:i:s' }}: {{ task.name }}</a>
+               href="{% url 'result' th=task.hash %}">{{ task.date|date:'d M Y H:i:s' }}: {{ task.name }}</a>
           {% endfor %}
         </span>
       </div>
