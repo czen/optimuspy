@@ -106,7 +106,7 @@ class PassesTests(TestCase):
 
 
 class TasksTests(TestCase):
-    def test_inavlid_token(self):
+    def test_invalid_token(self):
         data = {
             'token': '123'
         }
