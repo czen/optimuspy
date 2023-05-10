@@ -12,6 +12,7 @@ django.setup()
 
 TOKEN: str = None
 
+
 def setUpModule():
     global TOKEN
     from web.models import User
@@ -102,3 +103,18 @@ class PassesTests(TestCase):
         json = r.json()
         self.assertFalse(json['error'])
         self.assertEqual(json['passes'], [p.name for p in settings.OPS_PASSES])
+
+
+class TasksTests(TestCase):
+    def test_empty(self):
+        data = {
+            'token': TOKEN
+        }
+        try:
+            r = requests.post('http://localhost:8000/api/tasks/', json=data, timeout=60)
+            json = r.json()
+            self.assertFalse(json['error'])
+            self.assertEqual(json['status'], 'success')
+            self.assertEqual(json['tasks'], [])
+        except requests.Timeout:
+            self.fail('timeout')

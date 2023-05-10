@@ -400,7 +400,7 @@ def api_tasks(request: HttpRequest):
     resp['tasks'] = [t.hash for t in Task.objects.filter(user=user)]
     resp['status'] = 'success'
     resp['error'] = False
-    return resp
+    return JsonResponse(resp)
 
 
 @csrf_exempt
