@@ -3,19 +3,32 @@ from django.conf import settings
 from django.test import TestCase
 from django.test.runner import DiscoverRunner
 
-from web.models import User
-
 # Create your tests here.
 
+# pylint: disable=import-outside-toplevel
+
+import django
+django.setup()
+
+
+def setUpModule():
+    from web.models import User
+    User.objects.create_user(username='unittest', password='123')
+
+
+def tearDownModule():
+    from web.models import User
+    User.objects.get(username='unittest').delete()
 
 
 class ProductionDBTestRunner(DiscoverRunner):
     """Custom test runner to do testing on live database :P"""
-    def setup_databases(self, **kwargs):
-        User.objects.create_user(username='unittest', password='123')
 
-    def teardown_databases(self, *args, **kwargs) -> None:
-        User.objects.get(username='unittest').delete()
+    def setup_databases(self, **kwargs):
+        pass
+
+    def teardown_databases(self, *args, **kwargs):
+        pass
 
 
 class AuthTests(TestCase):

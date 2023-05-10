@@ -29,5 +29,14 @@
     "opsc": true,
     "manage.py": true,
     ".env": true
-  }
+  },
+  "python.testing.unittestArgs": [
+    "-v",
+    "-s",
+    "./web",
+    "-p",
+    "test*.py"
+  ],
+  "python.testing.pytestEnabled": false,
+  "python.testing.unittestEnabled": true,
 }
