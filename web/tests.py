@@ -1,3 +1,4 @@
+import django
 import requests
 from django.conf import settings
 from django.test import TestCase
@@ -7,7 +8,6 @@ from django.test.runner import DiscoverRunner
 
 # pylint: disable=import-outside-toplevel, global-statement
 
-import django
 django.setup()
 
 TOKEN: str = None
@@ -21,8 +21,11 @@ def setUpModule():
 
 
 def tearDownModule():
-    from web.models import User
-    User.objects.get(username='unittest').delete()
+    from web.models import Task, User
+    u = User.objects.get(username='unittest')
+    for t in Task.objects.filter(user=u):
+        t.delete()
+    u.delete()
 
 
 class ProductionDBTestRunner(DiscoverRunner):
