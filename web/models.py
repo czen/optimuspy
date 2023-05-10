@@ -21,6 +21,10 @@ class API(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     key = models.CharField(max_length=32)
 
+    @staticmethod
+    def get_key(data: str) -> str:
+        return md5((data + settings.SECRET_KEY).encode('utf-8')).hexdigest()
+
 
 @receiver(si.post_save, sender=User)
 def create_user_API(sender, instance, created, **kwargs):
@@ -30,7 +34,7 @@ def create_user_API(sender, instance, created, **kwargs):
 
 @receiver(si.post_save, sender=User)
 def save_user_API(sender, instance, **kwargs):
-    instance.api.key = md5((instance.username + settings.SECRET_KEY).encode('utf-8')).hexdigest()
+    instance.api.key = API.get_key(instance.username)
     instance.api.save()
 
 

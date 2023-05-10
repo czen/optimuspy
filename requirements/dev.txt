@@ -5,3 +5,4 @@ djlint
 pylint-django
 pylint-celery
 flower
+requests

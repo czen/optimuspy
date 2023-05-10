@@ -1,4 +1,5 @@
 import csv
+import json
 from hashlib import md5
 from io import StringIO
 from math import pi
@@ -13,9 +14,11 @@ from django.contrib.auth.views import LoginView
 from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
+from django.views.decorators.csrf import csrf_exempt
 from django.views.generic.edit import FormView
+
 from web.forms import SignatureChoiceForm, SignUpForm, SubmitForm
-from web.models import Benchmark, CompError, Result, Task
+from web.models import Benchmark, CompError, Result, Task, User
 from web.ops.build_tools.ctags import Ctags, MainFoundException
 from web.ops.compilers import Compiler, Compilers, GenericCflags
 from web.ops.passes import Passes
@@ -199,7 +202,7 @@ def tasks_result(request: HttpRequest, tid: int):
         q1 = list(Benchmark.objects.filter(task=task))
         q2 = list(Result.objects.filter(task=task))
 
-        _x ,_y, _time = [], [], []
+        _x, _y, _time = [], [], []
         _unit, _cflags = [], []
         _comps, _pass = [], []
         _col, _err = [], []
@@ -328,3 +331,40 @@ def result_download(request: HttpRequest, rid: int):
     response['Content-Length'] = b.path.stat().st_size
     response['Content-Disposition'] = f'attachment; filename={b.path.name}'
     return response
+
+
+@csrf_exempt
+def api_auth(request: HttpRequest):
+    resp = {
+        'error': True,
+        'status': '',
+        'token': ''
+    }
+    req: dict = json.loads(request.body)
+    unam, pwd = req.get('username'), req.get('password')
+    if unam and pwd:
+        try:
+            user = User.objects.get(username=unam)
+        except User.DoesNotExist:
+            resp['status'] = 'user does not exist'
+        else:
+            if user.check_password(pwd):
+                resp['error'] = False
+                resp['status'] = 'success'
+                resp['token'] = user.api.key
+            else:
+                resp['status'] = 'invalid password'
+    else:
+        resp['status'] = 'invalid parameters'
+
+    return JsonResponse(resp)
+
+
+@csrf_exempt
+def api_submit(request: HttpRequest):
+    ...
+
+
+@csrf_exempt
+def api_result(request: HttpRequest):
+    ...
