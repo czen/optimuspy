@@ -106,6 +106,19 @@ class PassesTests(TestCase):
 
 
 class TasksTests(TestCase):
+    def test_inavlid_token(self):
+        data = {
+            'token': '123'
+        }
+        try:
+            r = requests.post('http://localhost:8000/api/tasks/', json=data, timeout=60)
+            json = r.json()
+            self.assertTrue(json['error'])
+            self.assertEqual(json['status'], 'invalid token')
+            self.assertEqual(json['tasks'], [])
+        except requests.Timeout:
+            self.fail('timeout')
+
     def test_empty(self):
         data = {
             'token': TOKEN

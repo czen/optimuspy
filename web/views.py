@@ -395,7 +395,7 @@ def api_tasks(request: HttpRequest):
         user = API.objects.get(key=token).user
     except API.DoesNotExist:
         resp['status'] = 'invalid token'
-        return resp
+        return JsonResponse(resp)
 
     resp['tasks'] = [t.hash for t in Task.objects.filter(user=user)]
     resp['status'] = 'success'
