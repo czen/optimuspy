@@ -160,3 +160,9 @@ cython_debug/
 #.idea/
 # .vscode/
 tasks/
+
+# intellij workspace
+.idea
+
+# misc. temporary files
+temp
