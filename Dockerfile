@@ -11,7 +11,9 @@ RUN apt install g++ clang-15 make wget \
 COPY ./scripts scripts
 RUN sh scripts/rabbitmq.sh
 
-COPY . /optimuspy
+COPY ./opsc-bin /optimuspy/opsc-bin
+COPY ./opsc /optimuspy/opsc
+COPY ./catch2 /optimuspy/catch2
 WORKDIR /optimuspy/opsc-bin
 
 RUN tar xf opsc.tar.xz
@@ -28,6 +30,15 @@ RUN wget https://github.com/catchorg/Catch2/releases/download/v3.3.2/catch_amalg
 RUN wget https://github.com/catchorg/Catch2/releases/download/v3.3.2/catch_amalgamated.hpp
 RUN make gpp
 RUN make clang
+
+COPY ./optimuspy /optimuspy/optimuspy
+COPY ./requirements /optimuspy/requirements
+COPY ./scripts /optimuspy/scripts
+COPY ./static /optimuspy/static
+COPY ./web /optimuspy/web
+COPY ./.env /optimuspy/.env
+COPY ./manage.py /optimuspy/manage.py
+
 
 WORKDIR /optimuspy
 RUN pip3 install -r requirements/prod.txt
