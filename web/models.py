@@ -62,7 +62,7 @@ class Task(models.Model):
     def compilers(self, data: list[str]):
         if not isinstance(data, list):
             raise ValueError
-        self._compilers = self.SEP.join(data)
+        self._compilers = self.SEP.join(map(str, data))
 
     @property
     def cflags(self):
@@ -82,7 +82,7 @@ class Task(models.Model):
     def passes(self, data: list[str]):
         if not isinstance(data, list):
             raise ValueError
-        self._passes = self.SEP.join(data)
+        self._passes = self.SEP.join(map(str, data))
 
     def mkdir(self) -> None:
         self.path = settings.TASKS_PATH / str(self.id)

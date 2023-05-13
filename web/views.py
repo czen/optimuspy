@@ -1,9 +1,12 @@
+import base64 as b64
 import csv
 import json
 from hashlib import md5
-from io import StringIO
+from io import StringIO, BytesIO
 from math import pi
 from pathlib import Path
+import binascii
+import tarfile
 
 from bokeh.embed import components
 from bokeh.models import ColumnDataSource, HoverTool
@@ -21,7 +24,8 @@ from django.views.generic.edit import FormView
 from web.forms import SignatureChoiceForm, SignUpForm, SubmitForm
 from web.models import API, Benchmark, CompError, Result, Task, User
 from web.ops.build_tools.ctags import Ctags, MainFoundException
-from web.ops.compilers import Compiler, Compilers, GenericCflags
+from web.ops.compilers import (Compiler, Compilers, GenericCflags,
+                               SubmitFormCflags)
 from web.ops.passes import Passes
 from web.tasks import compiler_job
 
@@ -405,7 +409,141 @@ def api_tasks(request: HttpRequest):
 
 @csrf_exempt
 def api_submit(request: HttpRequest):
-    ...
+    resp = {
+        'error': True,
+        'status': 'success',
+        'task': ''
+    }
+    req: dict = json.loads(request.body)
+    token = req.get('token')
+
+    user: User = None
+    try:
+        user = API.objects.get(key=token).user
+    except API.DoesNotExist:
+        resp['status'] = 'invalid token'
+        return JsonResponse(resp)
+
+    comps = req.get('compilers')
+    passes = req.get('passes')
+    cflags = req.get('cflags')
+    files = req.get('files')
+    tests = req.get('tests')
+
+    # validate parameters presence
+    if any(i is None for i in (comps, passes, cflags, files, tests)):
+        resp['status'] = 'invalid parameters'
+        return JsonResponse(resp)
+
+    # ensure that compilers list is not empty
+    if comps == []:
+        resp['status'] = 'compilers list is empty'
+        return JsonResponse(resp)
+
+    # ensure that passes list is not empty
+    if passes == []:
+        resp['status'] = 'passes list is empty'
+        return JsonResponse(resp)
+
+    # ensure that cflags list is not empty
+    if cflags == []:
+        resp['status'] = 'cflags list is empty'
+        return JsonResponse(resp)
+
+    try:  # validate compilers
+        _t = []
+        for i in comps:
+            c = Compilers[i]
+            if c in settings.COMPILERS:
+                _t.append(c.value)
+            else:
+                resp['status'] = f'compiler {c.name} is disabled'
+                return JsonResponse(resp)
+        comps = _t
+    except KeyError as e:
+        resp['status'] = f'invalid compiler {e.args[0]}'
+        return JsonResponse(resp)
+
+    try:  # validate passes
+        _t = []
+        for i in passes:
+            p = Passes[i]
+            if p in settings.OPS_PASSES:
+                _t.append(p.value)
+            else:
+                resp['status'] = f'pass {p.name} is disabled'
+                return JsonResponse(resp)
+        passes = _t
+    except KeyError as e:
+        resp['status'] = f'invalid pass {e.args[0]}'
+        return JsonResponse(resp)
+
+    try:  # validate cflags
+        cflags = [SubmitFormCflags[i].name for i in cflags]
+    except KeyError as e:
+        resp['status'] = f'invalid cflags {e.args[0]}'
+        return JsonResponse(resp)
+
+    try:  # ensure that files is a base6-encoded string
+        files = BytesIO(b64.b64decode(files, validate=True))
+    except binascii.Error:
+        resp['status'] = 'files are not properly encoded'
+        return JsonResponse(resp)
+
+    # validate tests
+    if isinstance(tests, int):
+        if not 0 < tests <= 100:
+            resp['status'] = 'invalid number of tests'
+            return JsonResponse(resp)
+    else:
+        resp['status'] = 'number of tests must be int'
+        return JsonResponse(resp)
+
+    task = Task(user=user, tests=tests)
+    task.save()
+    task.mkdir()
+
+    try:  # extract all files to task dir
+        with tarfile.open(fileobj=files, mode='r:*') as tar:
+            tar.extractall(task.path)
+    except tarfile.TarError:
+        resp['status'] = 'files are not properly archived'
+        return JsonResponse(resp)
+
+    # resolve target function signature and name
+    try:
+        ct = Ctags(task.path)
+    except MainFoundException:
+        task.rmdir()
+        task.delete()
+        resp['status'] = 'files must not contain main function declaration'
+        return JsonResponse(resp)
+
+    # if no signatures detected
+    if len(ct.signatures) == 0:
+        task.rmdir()
+        task.delete()
+        resp['status'] = 'could not find any function signatures in files'
+        return JsonResponse(resp)
+
+    # if an only signature is detected
+    if r := ct.resolve_signature():
+        task.f_sign = r.sign
+        task.f_name = r.name
+    else:  # if we can't auto resolve target function
+        resp['status'] = 'could not resolve target function signature'
+        return JsonResponse(resp)
+
+    task.hash = md5sum(task.path)
+    task.name = task.hash
+    task.compilers = comps
+    task.passes = passes
+    task.cflags = cflags
+
+    resp['error'] = False
+    resp['task'] = task.hash
+    compiler_job.delay(task.id)
+    return JsonResponse(resp)
 
 
 @csrf_exempt
