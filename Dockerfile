@@ -4,12 +4,7 @@ RUN mkdir optimuspy
 
 WORKDIR /optimuspy
 
-RUN apt update
-RUN apt install g++ clang-15 make wget \
-    exuberant-ctags xz-utils python3-pip -y
-
 COPY ./scripts scripts
-RUN sh scripts/rabbitmq.sh
 
 COPY ./opsc-bin /optimuspy/opsc-bin
 COPY ./opsc /optimuspy/opsc
@@ -42,9 +37,7 @@ COPY ./web /optimuspy/web
 COPY ./.env /optimuspy/.env
 COPY ./manage.py /optimuspy/manage.py
 
-
 WORKDIR /optimuspy
 
-RUN python3 ./manage.py migrate
 RUN mkdir -p tasks
 EXPOSE 8000
