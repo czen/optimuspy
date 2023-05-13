@@ -508,6 +508,9 @@ class SubmitTests(TestCase):
             self.assertFalse(json['error'])
             self.assertEqual(json['status'], 'success')
             self.assertNotEqual(json['task'], '')
-            TASK = json['task']
         except requests.Timeout:
             self.fail('timeout')
+
+
+class GeneralUseCase(TestCase):
+    pass

@@ -549,3 +549,60 @@ def api_submit(request: HttpRequest):
 @csrf_exempt
 def api_result(request: HttpRequest):
     ...
+
+
+@csrf_exempt
+def api_download(request: HttpRequest):
+    resp = {
+        'error': True,
+        'status': 'success',
+        'file': ''
+    }
+    req: dict = json.loads(request.body)
+    token = req.get('token')
+
+    user: User = None
+    try:
+        user = API.objects.get(key=token).user
+    except API.DoesNotExist:
+        resp['status'] = 'invalid token'
+        return JsonResponse(resp)
+
+    pas = resp.get('pas')
+    task = resp.get('task')
+
+    if pas is None or task is None:
+        resp['status'] = 'invalid parameters'
+        return JsonResponse(resp)
+    try:
+        pas = Passes[pas]
+    except KeyError as e:
+        resp['status'] = f'invalid pass {e.args[0]}'
+
+    try:
+        task = Task.objects.get(user=user, hash=task)
+    except Task.DoesNotExist:
+        resp['status'] = 'no such task'
+        return JsonResponse(resp)
+
+    if not task.ready:
+        resp['status'] = 'task is not ready yet'
+        return JsonResponse(resp)
+
+    if pas.value not in task.passes:
+        resp['status'] = 'task has no result for this pass'
+        return JsonResponse(resp)
+
+    try:
+        result = Result.objects.get(task=task, num=pas.value)
+    except Result.DoesNotExist:
+        resp['status'] = 'unknown error occured'
+        return JsonResponse(resp)
+
+    data = BytesIO()
+    with open(result.path, 'rb') as f:
+        while chunk := f.read(4096):
+            data.write(chunk)
+    resp['error'] = False
+    resp['file'] = b64.b64encode(data.getbuffer()).decode('utf-8')
+    return JsonResponse(resp)
