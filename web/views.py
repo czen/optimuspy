@@ -401,7 +401,7 @@ def api_tasks(request: HttpRequest):
         resp['status'] = 'invalid token'
         return JsonResponse(resp)
 
-    resp['tasks'] = [t.hash for t in Task.objects.filter(user=user)]
+    resp['tasks'] = [t.hash for t in Task.objects.filter(user=user).order_by('-date')]
     resp['status'] = 'success'
     resp['error'] = False
     return JsonResponse(resp)

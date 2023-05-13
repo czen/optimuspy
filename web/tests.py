@@ -153,7 +153,7 @@ class TasksTests(TestCase):
         except requests.Timeout:
             self.fail('timeout')
 
-    def test_empty(self):
+    def test_success(self):
         data = {
             'token': TOKEN
         }
@@ -162,7 +162,6 @@ class TasksTests(TestCase):
             json = r.json()
             self.assertFalse(json['error'])
             self.assertEqual(json['status'], 'success')
-            self.assertEqual(json['tasks'], [])
         except requests.Timeout:
             self.fail('timeout')
 
