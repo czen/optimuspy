@@ -1,4 +1,4 @@
-FROM ubuntu:latest
+FROM cooliron/optimuspy:base
 
 RUN mkdir optimuspy
 
@@ -6,11 +6,7 @@ COPY . optimuspy
 
 WORKDIR /optimuspy
 
-RUN apt update
-RUN apt install g++ clang-15 make \
-    exuberant-ctags xz-utils python3-pip -y
-
-RUN sh scripts/rabbitmq.sh
+# RUN sh scripts/rabbitmq.sh
 
 WORKDIR /optimuspy/opsc-bin
 
@@ -31,7 +27,6 @@ RUN make clang
 
 WORKDIR /optimuspy
 RUN pip3 install -r requirements/prod.txt
-RUN python3 ./manage.py migrate
+# RUN python3 ./manage.py migrate
 RUN mkdir -p tasks
-RUN rm -rf /var/cache/apt/archives /var/lib/apt/lists/*
 EXPOSE 8000

@@ -1,12 +1,23 @@
 version: "3.9"
 services:
+  db:
+    image: postgres
+    env_file:
+      - .env
+
+  rabbitmq:
+    image: rabbitmq
+
   web:
     build: .
     ports:
-      - 8000:8000
+      - "8000:8000"
     entrypoint: /bin/sh
     command: scripts/run.sh
     volumes:
       - ./optimuspy:/optimuspy/optimuspy
       - ./static:/optimuspy/static
       - ./web:/optimuspy/web
+    depends_on:
+      - db
+      - rabbitmq

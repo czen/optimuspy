@@ -1,5 +1,7 @@
 #!/bin/sh
 
+apt-get update
+
 apt-get install curl gnupg apt-transport-https -y
 
 ## Team RabbitMQ's main signing key

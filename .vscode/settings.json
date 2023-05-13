@@ -3,8 +3,17 @@
     {
       "previewLimit": 50,
       "driver": "SQLite",
-      "name": "optimuspy",
+      "name": "optimuspy-sqlite",
       "database": "${workspaceFolder:optimuspy}/db.sqlite3"
+    },
+    {
+      "previewLimit": 50,
+      "server": "localhost",
+      "port": 5432,
+      "driver": "PostgreSQL",
+      "name": "optimuspy",
+      "database": "optimuspy",
+      "username": "optimuspy",
     }
   ],
   "python.linting.pylintArgs": [
@@ -13,12 +22,12 @@
     "--disable=missing-docstring",
     "--disable=invalid-name"
   ],
-  "sqltools.useNodeRuntime": true,
+  // "sqltools.useNodeRuntime": true,
   "sqltools.autoOpenSessionFiles": false,
-  "sqltools.autoConnectTo": [
-    "optimuspy"
-  ],
-  "sqltools.disableNodeDetectNotifications": true,
+  // "sqltools.autoConnectTo": [
+  //   "optimuspy"
+  // ],
+  // "sqltools.disableNodeDetectNotifications": true,
   "files.exclude": {
     "**/__pycache__": true,
     ".venv": true,
