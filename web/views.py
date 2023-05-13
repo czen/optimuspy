@@ -8,18 +8,25 @@ from bokeh.embed import components
 from bokeh.models import ColumnDataSource, HoverTool
 from bokeh.plotting import figure
 from django.contrib.auth import login, logout
+from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import LoginView
 from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
 from django.views.generic.edit import FormView
+from rest_framework import viewsets
+from rest_framework import permissions
+from rest_framework.response import Response
 from web.forms import SignatureChoiceForm, SignUpForm, SubmitForm
 from web.models import Benchmark, CompError, Result, Task
 from web.ops.build_tools.ctags import Ctags, MainFoundException
 from web.ops.compilers import Compiler, Compilers, GenericCflags
 from web.ops.passes import Passes
 from web.tasks import compiler_job
+from web.serializers import UserSerializer, TaskSerializer, ResultSerializer, BenchmarkSerializer, CompilerErrorSerializer
+
+
 
 # Create your views here.
 
@@ -328,3 +335,43 @@ def result_download(request: HttpRequest, rid: int):
     response['Content-Length'] = b.path.stat().st_size
     response['Content-Disposition'] = f'attachment; filename={b.path.name}'
     return response
+
+class UserViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows users to be viewed or edited.
+    """
+    queryset = User.objects.all().order_by('-date_joined')
+    serializer_class = UserSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+class TaskViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows tasks to be viewed or edited.
+    """
+    queryset = Task.objects.all().order_by('-date')
+    serializer_class = TaskSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+class ResultViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows task results to be viewed.
+    """
+    queryset = Result.objects.all().order_by('-id')
+    serializer_class = ResultSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+class BenchmarkViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows benchmark results to be viewed.
+    """
+    queryset = Benchmark.objects.all().order_by('-id')
+    serializer_class = BenchmarkSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+class CompilerErrorViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows compiler errors to be viewed.
+    """
+    queryset = CompError.objects.all().order_by('-id')
+    serializer_class = CompilerErrorSerializer
+    permission_classes = [permissions.IsAuthenticated]

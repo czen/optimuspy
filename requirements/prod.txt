@@ -6,3 +6,4 @@ python-decouple
 Celery
 django-extensions
 bokeh
+djangorestframework
