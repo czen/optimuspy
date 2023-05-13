@@ -20,7 +20,11 @@ logger = get_logger(__name__)
 @celery_app.task
 def compiler_job(task_id: int):
     # Obtain all necessary data
-    task = Task.objects.get(id=task_id)
+    try:
+        task = Task.objects.get(id=task_id)
+    except Task.DoesNotExist:
+        logger.info('Task does not exist')
+        return
     path = Path(task.path)
 
     # Log execution start

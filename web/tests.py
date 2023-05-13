@@ -1,6 +1,7 @@
 import base64 as b64
 import tarfile
 from io import BytesIO
+from time import sleep
 
 import django
 import requests
@@ -493,7 +494,6 @@ class SubmitTests(TestCase):
             self.fail('timeout')
 
     def test_19_success(self):
-        global TASK
         data = {
             'token': TOKEN,
             'compilers': ['GCC'],
@@ -513,4 +513,73 @@ class SubmitTests(TestCase):
 
 
 class GeneralUseCase(TestCase):
-    pass
+    def test_01_submit(self):
+        global TASK
+        data = {
+            'token': TOKEN,
+            'compilers': ['GCC'],
+            'passes': ['NoOptPass'],
+            'cflags': ['O1'],
+            'files': TAR,
+            'tests': 1
+        }
+        try:
+            r = requests.post('http://localhost:8000/api/submit/', json=data, timeout=60)
+            json = r.json()
+            self.assertFalse(json['error'])
+            self.assertEqual(json['status'], 'success')
+            self.assertNotEqual(json['task'], '')
+            TASK = json['task']
+        except requests.Timeout:
+            self.fail('timeout')
+
+    def test_02_tasks(self):
+        data = {
+            'token': TOKEN,
+        }
+        try:
+            r = requests.post('http://localhost:8000/api/tasks/', json=data, timeout=60)
+            json = r.json()
+            self.assertFalse(json['error'])
+            self.assertEqual(json['status'], 'success')
+            self.assertEqual(json['tasks'], [TASK])
+        except requests.Timeout:
+            self.fail('timeout')
+
+    def test_03_result(self):
+        data = {
+            'token': TOKEN,
+            'task': TASK
+        }
+        i = 0
+        while True:
+            if (i := i + 1) > 5:
+                break
+            try:
+                r = requests.post('http://localhost:8000/api/result/', json=data, timeout=360)
+                json = r.json()
+                if json['status'] == 'success':
+                    break
+            except requests.Timeout:
+                self.fail('timeout')
+            sleep(5)
+
+        self.assertFalse(json['error'])
+        self.assertEqual(json['status'], 'success')
+        self.assertNotEqual(json['benchmarks'], {})
+
+    def test_04_download(self):
+        data = {
+            'token': TOKEN,
+            'task': TASK,
+            'pas': 'NoOptPass'
+        }
+        try:
+            r = requests.post('http://localhost:8000/api/download/', json=data, timeout=360)
+            json = r.json()
+
+            # self.assertFalse(json['error'])
+            self.assertEqual(json['status'], 'success')
+            self.assertNotEqual(json['file'], '')
+        except requests.Timeout:
+            self.fail('timeout')

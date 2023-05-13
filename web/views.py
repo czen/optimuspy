@@ -207,7 +207,7 @@ def tasks_result(request: HttpRequest, th: str):
         q1 = list(Benchmark.objects.filter(task=task))
         q2 = list(Result.objects.filter(task=task))
 
-        _x, _y, _time = [], [], []
+        _x, _y, _value = [], [], []
         _unit, _cflags = [], []
         _comps, _pass = [], []
         _col, _err = [], []
@@ -220,7 +220,7 @@ def tasks_result(request: HttpRequest, th: str):
             _pass.append(pas.name)
             _x.append(f'{comp.short} {cflags} {pas.short}')
             _y.append(b.value)
-            _time.append(b.value)
+            _value.append(b.value)
             _unit.append(b.unit)
             _col.append('blue' if not b.error else 'red')
             _e = CompError.objects.filter(bench=b).first()
@@ -229,10 +229,10 @@ def tasks_result(request: HttpRequest, th: str):
         data = ColumnDataSource(data={
             'x': _x,
             'y': _y,
-            'time': _time,
+            'value': _value,
             'unit': _unit,
-            'cflags': _cflags,
             'comps': _comps,
+            'cflags': _cflags,
             'pass': _pass,
             'color': _col,
             'err': _err
@@ -240,7 +240,7 @@ def tasks_result(request: HttpRequest, th: str):
 
         hover = HoverTool(
             tooltips=[
-                ('time', '@time @unit'),
+                ('time', '@value @unit'),
                 ('compiler', '@comps'),
                 ('cflags', '@cflags'),
                 ('ops', '@pass'),
@@ -508,6 +508,8 @@ def api_submit(request: HttpRequest):
             tar.extractall(task.path)
     except tarfile.TarError:
         resp['status'] = 'files are not properly archived'
+        task.rmdir()
+        task.delete()
         return JsonResponse(resp)
 
     # resolve target function signature and name
@@ -531,6 +533,8 @@ def api_submit(request: HttpRequest):
         task.f_sign = r.sign
         task.f_name = r.name
     else:  # if we can't auto resolve target function
+        task.rmdir()
+        task.delete()
         resp['status'] = 'could not resolve target function signature'
         return JsonResponse(resp)
 
@@ -539,6 +543,7 @@ def api_submit(request: HttpRequest):
     task.compilers = comps
     task.passes = passes
     task.cflags = cflags
+    task.save()
 
     resp['error'] = False
     resp['task'] = task.hash
@@ -548,7 +553,53 @@ def api_submit(request: HttpRequest):
 
 @csrf_exempt
 def api_result(request: HttpRequest):
-    ...
+    resp = {
+        'error': True,
+        'status': 'success',
+        'benchmarks': []
+    }
+
+    req: dict = json.loads(request.body)
+    token = req.get('token')
+
+    user: User = None
+    try:
+        user = API.objects.get(key=token).user
+    except API.DoesNotExist:
+        resp['status'] = 'invalid token'
+        return JsonResponse(resp)
+
+    task = req.get('task')
+    if task is None:
+        resp['status'] = 'invalid parameters'
+        return JsonResponse(resp)
+
+    try:
+        task = Task.objects.get(user=user, hash=task)
+    except Task.DoesNotExist:
+        resp['status'] = 'no such task'
+        return JsonResponse(resp)
+
+    if not task.ready:
+        resp['status'] = 'task is not ready yet'
+        return JsonResponse(resp)
+
+    resp['benchmarks'] = []  # this is for a linter to see
+    for b in Benchmark.objects.filter(task=task):
+        comp = Compilers(b.compiler)
+        pas = Passes(b.pas)
+        resp['benchmarks'].append(
+            {
+                'value': b.value,
+                'unit': b.unit,
+                'compiler': comp.name,
+                'cflags': comp.obj.cflags[b.cflags].name,
+                'pas': pas.name,
+                'error': b.error,
+            }
+        )
+    resp['error'] = False
+    return JsonResponse(resp)
 
 
 @csrf_exempt
@@ -568,8 +619,8 @@ def api_download(request: HttpRequest):
         resp['status'] = 'invalid token'
         return JsonResponse(resp)
 
-    pas = resp.get('pas')
-    task = resp.get('task')
+    task = req.get('task')
+    pas = req.get('pas')
 
     if pas is None or task is None:
         resp['status'] = 'invalid parameters'
