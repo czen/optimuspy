@@ -31,8 +31,11 @@ RUN wget https://github.com/catchorg/Catch2/releases/download/v3.3.2/catch_amalg
 RUN make gpp
 RUN make clang
 
-COPY ./optimuspy /optimuspy/optimuspy
+WORKDIR /optimuspy
 COPY ./requirements /optimuspy/requirements
+RUN pip3 install -r requirements/prod.txt
+
+COPY ./optimuspy /optimuspy/optimuspy
 COPY ./scripts /optimuspy/scripts
 COPY ./static /optimuspy/static
 COPY ./web /optimuspy/web
@@ -41,7 +44,7 @@ COPY ./manage.py /optimuspy/manage.py
 
 
 WORKDIR /optimuspy
-RUN pip3 install -r requirements/prod.txt
+
 RUN python3 ./manage.py migrate
 RUN mkdir -p tasks
 RUN rm -rf /var/cache/apt/archives /var/lib/apt/lists/*
