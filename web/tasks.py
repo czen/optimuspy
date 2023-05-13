@@ -122,7 +122,11 @@ def compiler_job(task_id: int):
                         tar.add(file)
 
                 for file in files2:
-                    file.unlink()
+                    if file.is_file():
+                        file.unlink()
+                    else:
+                        shutil.rmtree(file)
+
             except Exception as e3:
                 logger.info(e3)
                 r.error = True
@@ -137,7 +141,10 @@ def compiler_job(task_id: int):
 
     # Cleanup task root dir
     for file in files:
-        file.unlink()
+        if file.is_file():
+            file.unlink()
+        else:
+            shutil.rmtree(file)
 
     task.ready = True
     task.save()
