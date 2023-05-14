@@ -1,36 +1,29 @@
+{% extends "web/base.html" %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="ru-RU">
-  <head>
-    <title>Список</title>
-    {% load bootstrap5 %}
-    {% bootstrap_css %} {% bootstrap_javascript %}
-    <link rel="stylesheet" type="text/css" href="{% static 'css/main.css' %}" />
-    <link rel="shortcut icon"
-          type="image/png"
-          href="{% static 'favicon.ico' %}" />
-    <meta name="description" content="View list of tasks">
-    <meta name="keywords" content="Submit, View">
-  </head>
-  <body>
-    <div class="mt-5 nav">
-      <a role="button" class="btn btn-light btn-lg" href={% url 'submit' %}>Отправить</a>
-      <div>
-        <p class="text-white text-center">{{ username }}</p>
-        <a role="button" class="btn btn-dark btn-sm" href={% url 'logout' %}>Выйти</a>
-      </div>
+{% block title %}
+  Список
+{% endblock title %}
+{% block style %}
+  <link rel="stylesheet" type="text/css" href="{% static 'css/main.css' %}" />
+{% endblock style %}
+{% block content %}
+  <div class="mt-5 nav">
+    <a role="button" class="btn btn-light btn-lg" href={% url 'submit' %}>Отправить</a>
+    <div>
+      <p class="text-white text-center">{{ username }}</p>
+      <a role="button" class="btn btn-dark btn-sm" href={% url 'logout' %}>Выйти</a>
     </div>
-    <div class="h-80 d-flex align-items-center justify-content-center">
-      <div class="container text-white">
-        <h4 class="m-5 text-center">{{ msg }}</h4>
-        <span>
-          {% for task in tasks %}
-            <a role="button"
-               class="btn btn-dark btn-lg m-2 d-block text-start"
-               href="{% url 'result' th=task.hash %}">{{ task.date|date:'d M Y H:i:s' }}: {{ task.name }}</a>
-          {% endfor %}
-        </span>
-      </div>
+  </div>
+  <div class="h-80 d-flex align-items-center justify-content-center">
+    <div class="container text-white">
+      <h4 class="m-5 text-center">{{ msg }}</h4>
+      <span>
+        {% for task in tasks %}
+          <a role="button"
+             class="btn btn-dark btn-lg m-2 d-block text-start"
+             href="{% url 'result' th=task.hash %}">{{ task.date|date:'d M Y H:i:s' }}: {{ task.name }}</a>
+        {% endfor %}
+      </span>
     </div>
-  </body>
-</html>
+  </div>
+{% endblock content %}

@@ -1,39 +1,32 @@
+{% extends "web/base.html" %}
+{% load crispy_forms_tags %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="ru-RU">
-  <head>
-    <title>Вход</title>
-    {% load bootstrap5 %}
-    {% bootstrap_css %} {% bootstrap_javascript %}
-    {% load crispy_forms_tags %}
-    <link rel="stylesheet" type="text/css" href="{% static 'css/login.css' %}" />
-    <link rel="shortcut icon"
-          type="image/png"
-          href="{% static 'favicon.ico' %}" />
-    <meta name="description" content="Log in">
-    <meta name="keywords" content="Log in">
-  </head>
-  <body>
-    <div class="mt-5">
-      <a role="button" class="btn btn-light btn-lg" href={% url 'index' %}>Назад</a>
+{% block title %}
+  Вход
+{% endblock title %}
+{% block style %}
+  <link rel="stylesheet" type="text/css" href="{% static 'css/login.css' %}" />
+{% endblock style %}
+{% block content %}
+  <div class="mt-5">
+    <a role="button" class="btn btn-light btn-lg" href={% url 'index' %}>Назад</a>
+  </div>
+  <div class="h-100 d-flex align-items-center justify-content-center">
+    <div class="container text-center text-white">
+      <h2 class="lab">Войти</h2>
+      <form method="post">
+        {% csrf_token %}
+        {{ form|crispy }}
+        <button type="submit" class="btn btn-dark btn-lg btn-m">Готово</button>
+      </form>
     </div>
-    <div class="h-100 d-flex align-items-center justify-content-center">
-      <div class="container text-center text-white">
-        <h2 class="lab">Войти</h2>
-        <form method="post">
-          {% csrf_token %}
-          {{ form|crispy }}
-          <button type="submit" class="btn btn-dark btn-lg btn-m">Готово</button>
-        </form>
-      </div>
-    </div>
-    <div class="text-white text-center">
-      Все еще нет аккаунта?
-      <a href="{% url 'signup' %}">Зарегистрироваться</a>
-    </div>
-    <div class="text-white text-center">
-      Забыли пароль?
-      <a href="{% url 'password_reset' %}">Сбросить</a>
-    </div>
-  </body>
-</html>
+  </div>
+  <div class="text-white text-center">
+    Все еще нет аккаунта?
+    <a href="{% url 'signup' %}">Зарегистрироваться</a>
+  </div>
+  <div class="text-white text-center">
+    Забыли пароль?
+    <a href="{% url 'password_reset' %}">Сбросить</a>
+  </div>
+{% endblock content %}
