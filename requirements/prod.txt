@@ -7,3 +7,4 @@ Celery
 django-extensions
 bokeh
 psycopg2
+gunicorn

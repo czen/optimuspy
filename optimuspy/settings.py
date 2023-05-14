@@ -29,7 +29,7 @@ SECRET_KEY = config('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -141,6 +141,8 @@ STATICFILES_DIRS = [
     BASE_DIR / 'static'
 ]
 
+STATIC_ROOT = '/var/www/optimuspy/static'
+
 MEDIA_URL = 'images/'
 
 MEDIA_ROOT = BASE_DIR / 'static/images'
@@ -155,7 +157,7 @@ CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 CRISPY_TEMPLATE_PACK = "bootstrap5"
 
 # Custom test runner to do testing on live database :P
-TEST_RUNNER='web.tests.ProductionDBTestRunner'
+TEST_RUNNER = 'web.tests.ProductionDBTestRunner'
 
 TASKS_PATH = Path('tasks/')
 
@@ -169,7 +171,7 @@ OPSC_PATH = (BASE_DIR / 'opsc').resolve()
 # -----------
 COMPILERS = [
     Compilers.GCC, Compilers.Clang
-    ]
+]
 if not COMPILERS:
     raise Warning('You have to choose at least one compiler')
 
@@ -178,8 +180,6 @@ if not COMPILERS:
 # -----------
 OPS_PASSES = [
     Passes.NoOptPass, Passes.OMPPass, Passes.TilingPass
-    ]
+]
 if not OPS_PASSES:
     raise Warning('You have to choose at least one pass')
-
-

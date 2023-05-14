@@ -3,23 +3,36 @@ services:
   db:
     image: postgres
     # volumes:
-      # - ./data/db:/var/lib/postgresql/data
+    # - db_data:/var/lib/postgresql/data
     env_file:
       - .env
 
   rabbitmq:
     image: rabbitmq
 
+  nginx:
+    build: ./nginx
+    volumes:
+      - static_files:/var/www/optimuspy/static
+    ports:
+      - 8000:80
+    depends_on:
+      - web
+
   web:
     build: .
-    ports:
-      - "8000:8000"
     entrypoint: /bin/sh
-    command: scripts/run.sh
+    command: scripts/entrypoint.sh
     volumes:
       - ./optimuspy:/optimuspy/optimuspy
       - ./static:/optimuspy/static
       - ./web:/optimuspy/web
+      - static_files:/var/www/optimuspy/static
     depends_on:
       - db
       - rabbitmq
+    expose:
+      - 8000
+
+volumes:
+  static_files:

@@ -37,7 +37,8 @@ COPY ./web /optimuspy/web
 COPY ./.env /optimuspy/.env
 COPY ./manage.py /optimuspy/manage.py
 
+RUN python3 manage.py collectstatic
+
 WORKDIR /optimuspy
 
 RUN mkdir -p tasks
-EXPOSE 8000
