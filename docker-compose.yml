@@ -12,7 +12,6 @@ services:
 
   nginx:
     build: ./nginx
-    container_name: nginx
     volumes:
       - static_files:/var/www/optimuspy/static
     ports:
@@ -22,7 +21,6 @@ services:
 
   web:
     build: .
-    container_name: web
     entrypoint: /bin/sh
     command: scripts/entrypoint.sh
     volumes:

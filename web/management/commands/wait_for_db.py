@@ -15,7 +15,7 @@ class Command(BaseCommand):
                 # get the database with keyword 'default' from settings.py
                 db_conn = connections['default']
                 # prints success messge in green
-                self.stdout.write(self.style.SUCCESS('db available'))
+                self.stdout.write(self.style.SUCCESS('Database online'))
             except OperationalError:
-                self.stdout.write("Database unavailable, waiting 1 second ...")
+                self.stdout.write('Database offline, waiting 1 second ...')
                 time.sleep(1)
