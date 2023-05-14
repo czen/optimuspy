@@ -47,8 +47,12 @@ TASK: str = None
 def setUpModule():
     global TOKEN
     from web.models import User
-    u = User.objects.create_user(username='unittest', password='123')
-    TOKEN = u.api.key
+    try:
+        u = User.objects.get(username='unittest')
+    except User.DoesNotExist:
+        u = User.objects.create_user(username='unittest', password='123')
+    finally:
+        TOKEN = u.api.key
 
 
 def tearDownModule():
@@ -56,7 +60,6 @@ def tearDownModule():
     u = User.objects.get(username='unittest')
     for t in Task.objects.filter(user=u):
         t.rmdir()
-        t.delete()
     u.delete()
 
 
@@ -168,9 +171,27 @@ class TasksTests(TestCase):
 
 
 class SubmitTests(TestCase):
-    def test_01_invalid_token(self):
+    def test_invalid_params(self):
         data = {
             'foo': 'bar'
+        }
+        try:
+            r = requests.post('http://localhost:8000/api/submit/', json=data, timeout=60)
+            json = r.json()
+            self.assertTrue(json['error'])
+            self.assertEqual(json['status'], 'invalid parameters')
+            self.assertEqual(json['task'], '')
+        except requests.Timeout:
+            self.fail('timeout')
+
+    def test_invalid_token(self):
+        data = {
+            'token': '123',
+            'compilers': ['GCC'],
+            'passes': ['NoOptPass'],
+            'cflags': ['O1'],
+            'files': '123',
+            'tests': 1
         }
         try:
             r = requests.post('http://localhost:8000/api/submit/', json=data, timeout=60)
@@ -181,21 +202,7 @@ class SubmitTests(TestCase):
         except requests.Timeout:
             self.fail('timeout')
 
-    def test_02_invalid_params(self):
-        data = {
-            'token': TOKEN,
-            'foo': 'bar'
-        }
-        try:
-            r = requests.post('http://localhost:8000/api/submit/', json=data, timeout=60)
-            json = r.json()
-            self.assertTrue(json['error'])
-            self.assertEqual(json['status'], 'invalid parameters')
-            self.assertEqual(json['task'], '')
-        except requests.Timeout:
-            self.fail('timeout')
-
-    def test_03_compilers_missing(self):
+    def test_compilers_missing(self):
         data = {
             'token': TOKEN,
             'passes': ['NoOptPass'],
@@ -212,7 +219,7 @@ class SubmitTests(TestCase):
         except requests.Timeout:
             self.fail('timeout')
 
-    def test_04_passes_missing(self):
+    def test_passes_missing(self):
         data = {
             'token': TOKEN,
             'compilers': ['GCC'],
@@ -229,7 +236,7 @@ class SubmitTests(TestCase):
         except requests.Timeout:
             self.fail('timeout')
 
-    def test_05_cflags_missing(self):
+    def test_cflags_missing(self):
         data = {
             'token': TOKEN,
             'compilers': ['GCC'],
@@ -246,7 +253,7 @@ class SubmitTests(TestCase):
         except requests.Timeout:
             self.fail('timeout')
 
-    def test_06_files_missing(self):
+    def test_files_missing(self):
         data = {
             'token': TOKEN,
             'compilers': ['GCC'],
@@ -263,7 +270,7 @@ class SubmitTests(TestCase):
         except requests.Timeout:
             self.fail('timeout')
 
-    def test_07_tests_missing(self):
+    def test_tests_missing(self):
         data = {
             'token': TOKEN,
             'compilers': ['GCC'],
@@ -280,7 +287,7 @@ class SubmitTests(TestCase):
         except requests.Timeout:
             self.fail('timeout')
 
-    def test_08_compilers_empty(self):
+    def test_compilers_empty(self):
         data = {
             'token': TOKEN,
             'compilers': [],
@@ -298,7 +305,7 @@ class SubmitTests(TestCase):
         except requests.Timeout:
             self.fail('timeout')
 
-    def test_09_passes_empty(self):
+    def test_passes_empty(self):
         data = {
             'token': TOKEN,
             'compilers': ['GCC'],
@@ -316,7 +323,7 @@ class SubmitTests(TestCase):
         except requests.Timeout:
             self.fail('timeout')
 
-    def test_10_cflags_empty(self):
+    def test_cflags_empty(self):
         data = {
             'token': TOKEN,
             'compilers': ['GCC'],
@@ -334,7 +341,7 @@ class SubmitTests(TestCase):
         except requests.Timeout:
             self.fail('timeout')
 
-    def test_11_invalid_compiler(self):
+    def test_invalid_compiler(self):
         data = {
             'token': TOKEN,
             'compilers': ['test'],
@@ -347,12 +354,12 @@ class SubmitTests(TestCase):
             r = requests.post('http://localhost:8000/api/submit/', json=data, timeout=60)
             json = r.json()
             self.assertTrue(json['error'])
-            self.assertEqual(json['status'], 'invalid compiler test')
+            self.assertEqual(json['status'], "invalid compiler 'test'")
             self.assertEqual(json['task'], '')
         except requests.Timeout:
             self.fail('timeout')
 
-    def test_12_invalid_pass(self):
+    def test_invalid_pass(self):
         data = {
             'token': TOKEN,
             'compilers': ['GCC'],
@@ -365,12 +372,12 @@ class SubmitTests(TestCase):
             r = requests.post('http://localhost:8000/api/submit/', json=data, timeout=60)
             json = r.json()
             self.assertTrue(json['error'])
-            self.assertEqual(json['status'], 'invalid pass test')
+            self.assertEqual(json['status'], "invalid pass 'test'")
             self.assertEqual(json['task'], '')
         except requests.Timeout:
             self.fail('timeout')
 
-    def test_13_invalid_cflags(self):
+    def test_invalid_cflags(self):
         data = {
             'token': TOKEN,
             'compilers': ['GCC'],
@@ -383,12 +390,12 @@ class SubmitTests(TestCase):
             r = requests.post('http://localhost:8000/api/submit/', json=data, timeout=60)
             json = r.json()
             self.assertTrue(json['error'])
-            self.assertEqual(json['status'], 'invalid cflags test')
+            self.assertEqual(json['status'], "invalid cflags 'test'")
             self.assertEqual(json['task'], '')
         except requests.Timeout:
             self.fail('timeout')
 
-    def test_14_files_not_propely_encoded(self):
+    def test_files_not_propely_encoded(self):
         data = {
             'token': TOKEN,
             'compilers': ['GCC'],
@@ -406,7 +413,7 @@ class SubmitTests(TestCase):
         except requests.Timeout:
             self.fail('timeout')
 
-    def test_15_invalid_numer_of_tests(self):
+    def test_invalid_numer_of_tests(self):
         def test():
             try:
                 r = requests.post('http://localhost:8000/api/submit/', json=data, timeout=60)
@@ -436,7 +443,7 @@ class SubmitTests(TestCase):
         }
         test()
 
-    def test_16_has_main_func(self):
+    def test_has_main_func(self):
         data = {
             'token': TOKEN,
             'compilers': ['GCC'],
@@ -454,7 +461,7 @@ class SubmitTests(TestCase):
         except requests.Timeout:
             self.fail('timeout')
 
-    def test_17_no_func_signature(self):
+    def test_no_func_signature(self):
         data = {
             'token': TOKEN,
             'compilers': ['GCC'],
@@ -472,7 +479,7 @@ class SubmitTests(TestCase):
         except requests.Timeout:
             self.fail('timeout')
 
-    def test_18_could_not_resolve(self):
+    def test_could_not_resolve(self):
         data = {
             'token': TOKEN,
             'compilers': ['GCC'],
@@ -490,24 +497,6 @@ class SubmitTests(TestCase):
             self.assertTrue(json['error'])
             self.assertEqual(json['status'], 'could not resolve target function signature')
             self.assertEqual(json['task'], '')
-        except requests.Timeout:
-            self.fail('timeout')
-
-    def test_19_success(self):
-        data = {
-            'token': TOKEN,
-            'compilers': ['GCC'],
-            'passes': ['NoOptPass'],
-            'cflags': ['O1'],
-            'files': TAR,
-            'tests': 1
-        }
-        try:
-            r = requests.post('http://localhost:8000/api/submit/', json=data, timeout=60)
-            json = r.json()
-            self.assertFalse(json['error'])
-            self.assertEqual(json['status'], 'success')
-            self.assertNotEqual(json['task'], '')
         except requests.Timeout:
             self.fail('timeout')
 
@@ -556,7 +545,7 @@ class GeneralUseCase(TestCase):
             if (i := i + 1) > 5:
                 break
             try:
-                r = requests.post('http://localhost:8000/api/result/', json=data, timeout=360)
+                r = requests.post('http://localhost:8000/api/result/', json=data, timeout=60)
                 json = r.json()
                 if json['status'] == 'success':
                     break
@@ -575,11 +564,114 @@ class GeneralUseCase(TestCase):
             'pas': 'NoOptPass'
         }
         try:
-            r = requests.post('http://localhost:8000/api/download/', json=data, timeout=360)
+            r = requests.post('http://localhost:8000/api/download/', json=data, timeout=60)
             json = r.json()
 
             # self.assertFalse(json['error'])
             self.assertEqual(json['status'], 'success')
             self.assertNotEqual(json['file'], '')
+        except requests.Timeout:
+            self.fail('timeout')
+
+
+class ResultTests(TestCase):
+    def test_invalid_params(self):
+        data = {
+            'token': TOKEN
+        }
+        try:
+            r = requests.post('http://localhost:8000/api/result/', json=data, timeout=60)
+            json = r.json()
+            self.assertTrue(json['error'])
+            self.assertEqual(json['status'], 'invalid parameters')
+            self.assertEqual(json['benchmarks'], [])
+        except requests.Timeout:
+            self.fail('timeout')
+
+    def test_invalid_token(self):
+        data = {
+            'token': '123',
+            'task': 'test'
+        }
+        try:
+            r = requests.post('http://localhost:8000/api/result/', json=data, timeout=60)
+            json = r.json()
+            self.assertTrue(json['error'])
+            self.assertEqual(json['status'], 'invalid token')
+            self.assertEqual(json['benchmarks'], [])
+        except requests.Timeout:
+            self.fail('timeout')
+
+    def test_no_such_task(self):
+        data = {
+            'token': TOKEN,
+            'task': 'test'
+        }
+        try:
+            r = requests.post('http://localhost:8000/api/result/', json=data, timeout=60)
+            json = r.json()
+            self.assertTrue(json['error'])
+            self.assertEqual(json['status'], 'no such task')
+            self.assertEqual(json['benchmarks'], [])
+        except requests.Timeout:
+            self.fail('timeout')
+
+
+class DownloadTests(TestCase):
+    def test_invalid_params(self):
+        data = {
+            'token': TOKEN
+        }
+        try:
+            r = requests.post('http://localhost:8000/api/download/', json=data, timeout=60)
+            json = r.json()
+            self.assertTrue(json['error'])
+            self.assertEqual(json['status'], 'invalid parameters')
+            self.assertEqual(json['file'], '')
+        except requests.Timeout:
+            self.fail('timeout')
+
+    def test_invalid_token(self):
+        data = {
+            'token': '123',
+            'task': 'test',
+            'pas': 'NoOptPass'
+        }
+        try:
+            r = requests.post('http://localhost:8000/api/download/', json=data, timeout=60)
+            json = r.json()
+            self.assertTrue(json['error'])
+            self.assertEqual(json['status'], 'invalid token')
+            self.assertEqual(json['file'], '')
+        except requests.Timeout:
+            self.fail('timeout')
+
+    def test_invalid_pass(self):
+        data = {
+            'token': TOKEN,
+            'task': 'test',
+            'pas': 'test'
+        }
+        try:
+            r = requests.post('http://localhost:8000/api/download/', json=data, timeout=60)
+            json = r.json()
+            self.assertTrue(json['error'])
+            self.assertEqual(json['status'], "invalid pass 'test'")
+            self.assertEqual(json['file'], '')
+        except requests.Timeout:
+            self.fail('timeout')
+
+    def test_no_such_task(self):
+        data = {
+            'token': TOKEN,
+            'task': 'test',
+            'pas': 'NoOptPass'
+        }
+        try:
+            r = requests.post('http://localhost:8000/api/download/', json=data, timeout=60)
+            json = r.json()
+            self.assertTrue(json['error'])
+            self.assertEqual(json['status'], 'no such task')
+            self.assertEqual(json['file'], '')
         except requests.Timeout:
             self.fail('timeout')

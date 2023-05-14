@@ -416,14 +416,6 @@ def api_submit(request: HttpRequest):
     }
     req: dict = json.loads(request.body)
     token = req.get('token')
-
-    user: User = None
-    try:
-        user = API.objects.get(key=token).user
-    except API.DoesNotExist:
-        resp['status'] = 'invalid token'
-        return JsonResponse(resp)
-
     comps = req.get('compilers')
     passes = req.get('passes')
     cflags = req.get('cflags')
@@ -431,8 +423,15 @@ def api_submit(request: HttpRequest):
     tests = req.get('tests')
 
     # validate parameters presence
-    if any(i is None for i in (comps, passes, cflags, files, tests)):
+    if any(i is None for i in (token, comps, passes, cflags, files, tests)):
         resp['status'] = 'invalid parameters'
+        return JsonResponse(resp)
+
+    user: User = None
+    try:
+        user = API.objects.get(key=token).user
+    except API.DoesNotExist:
+        resp['status'] = 'invalid token'
         return JsonResponse(resp)
 
     # ensure that compilers list is not empty
@@ -461,7 +460,7 @@ def api_submit(request: HttpRequest):
                 return JsonResponse(resp)
         comps = _t
     except KeyError as e:
-        resp['status'] = f'invalid compiler {e.args[0]}'
+        resp['status'] = f"invalid compiler '{e.args[0]}'"
         return JsonResponse(resp)
 
     try:  # validate passes
@@ -475,13 +474,13 @@ def api_submit(request: HttpRequest):
                 return JsonResponse(resp)
         passes = _t
     except KeyError as e:
-        resp['status'] = f'invalid pass {e.args[0]}'
+        resp['status'] = f"invalid pass '{e.args[0]}'"
         return JsonResponse(resp)
 
     try:  # validate cflags
         cflags = [SubmitFormCflags[i].name for i in cflags]
     except KeyError as e:
-        resp['status'] = f'invalid cflags {e.args[0]}'
+        resp['status'] = f"invalid cflags '{e.args[0]}'"
         return JsonResponse(resp)
 
     try:  # ensure that files is a base6-encoded string
@@ -561,17 +560,16 @@ def api_result(request: HttpRequest):
 
     req: dict = json.loads(request.body)
     token = req.get('token')
+    task = req.get('task')
+    if token is None or task is None:
+        resp['status'] = 'invalid parameters'
+        return JsonResponse(resp)
 
     user: User = None
     try:
         user = API.objects.get(key=token).user
     except API.DoesNotExist:
         resp['status'] = 'invalid token'
-        return JsonResponse(resp)
-
-    task = req.get('task')
-    if task is None:
-        resp['status'] = 'invalid parameters'
         return JsonResponse(resp)
 
     try:
@@ -611,6 +609,12 @@ def api_download(request: HttpRequest):
     }
     req: dict = json.loads(request.body)
     token = req.get('token')
+    task = req.get('task')
+    pas = req.get('pas')
+
+    if any(i is None for i in (token, task, pas)):
+        resp['status'] = 'invalid parameters'
+        return JsonResponse(resp)
 
     user: User = None
     try:
@@ -619,16 +623,11 @@ def api_download(request: HttpRequest):
         resp['status'] = 'invalid token'
         return JsonResponse(resp)
 
-    task = req.get('task')
-    pas = req.get('pas')
-
-    if pas is None or task is None:
-        resp['status'] = 'invalid parameters'
-        return JsonResponse(resp)
     try:
         pas = Passes[pas]
     except KeyError as e:
-        resp['status'] = f'invalid pass {e.args[0]}'
+        resp['status'] = f"invalid pass '{e.args[0]}'"
+        return JsonResponse(resp)
 
     try:
         task = Task.objects.get(user=user, hash=task)
