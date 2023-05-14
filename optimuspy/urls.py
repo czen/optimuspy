@@ -17,9 +17,17 @@ Including another URLconf
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
+from django.contrib.auth.views import (PasswordChangeView,
+                                       PasswordResetCompleteView,
+                                       PasswordResetConfirmView,
+                                       PasswordResetDoneView,
+                                       PasswordResetView)
 from django.urls import path
 
 from web import views
+from web.forms import PasswordChangeF
+
+# Create your views here.
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -27,6 +35,23 @@ urlpatterns = [
     path('accounts/login/', views.LogIn.as_view(), name='login'),
     path('accounts/signup/', views.SignUp.as_view(), name='signup'),
     path('accounts/logout/', views.ulogout, name='logout'),
+    path('password/change/',
+         PasswordChangeView.as_view(
+             template_name='web/pwd/password_change.html',
+             success_url='/', form_class=PasswordChangeF
+         ), name='password_change'),
+    path('password/reset/',
+         PasswordResetView.as_view(
+             template_name='pwd/password_reset.html'), name='password_reset'),
+    path('password/reset/done/',
+         PasswordResetDoneView.as_view(
+             template_name='pwd/password_reset_done.html'), name='password_reset_done'),
+    path('password/reset/confirm/<uidb64>/<token>/',
+         PasswordResetConfirmView.as_view(
+             template_name='pwd/password_reset_confirm.html'), name='password_reset_confirm'),
+    path('password/reset/complete/',
+         PasswordResetCompleteView.as_view(
+             template_name='pwd/password_reset_complete.html'), name='password_reset_complete'),
     path('tasks/', views.tasks_list, name='list'),
     path('tasks/submit/', views.tasks_submit, name='submit'),
     path('tasks/<str:th>/result', views.tasks_result, name='result'),

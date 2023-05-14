@@ -3,7 +3,7 @@ from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Fieldset, Layout, Submit
 from django import forms
 from django.conf import settings
-from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.forms import UserCreationForm, PasswordChangeForm
 from web.ops.compilers import SubmitFormCflags
 from web.ops.passes import Passes
 from web.models import User, Task
@@ -96,3 +96,10 @@ class SignatureChoiceForm(forms.Form):
     def __init__(self, choices, *args, **kw) -> None:
         super().__init__(*args, **kw)
         self.fields['choice'] = forms.CharField(label='', widget=forms.Select(choices=choices), required=True)
+
+
+class PasswordChangeF(PasswordChangeForm):
+    def __init__(self, *args, **kwargs):
+        super(PasswordChangeForm, self).__init__(*args, **kwargs)
+        for name in ('old_password', 'new_password1', 'new_password2'):
+            self.fields[name].help_text = None
