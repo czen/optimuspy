@@ -47,6 +47,7 @@ TASK: str = None
 def setUpModule():
     global TOKEN
     from web.models import User
+    u: User = None
     try:
         u = User.objects.get(username='unittest')
     except User.DoesNotExist:
