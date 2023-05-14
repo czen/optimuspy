@@ -1,9 +1,11 @@
+from typing import Any, Optional
 from crispy_forms.bootstrap import InlineCheckboxes
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Fieldset, Layout, Submit
 from django import forms
 from django.conf import settings
-from django.contrib.auth.forms import UserCreationForm, PasswordChangeForm
+from django.contrib.auth.base_user import AbstractBaseUser
+from django.contrib.auth.forms import UserCreationForm, PasswordChangeForm, SetPasswordForm
 from web.ops.compilers import SubmitFormCflags
 from web.ops.passes import Passes
 from web.models import User, Task
@@ -102,4 +104,11 @@ class PasswordChangeF(PasswordChangeForm):
     def __init__(self, *args, **kwargs):
         super(PasswordChangeForm, self).__init__(*args, **kwargs)
         for name in ('old_password', 'new_password1', 'new_password2'):
+            self.fields[name].help_text = None
+
+
+class SetPasswordF(SetPasswordForm):
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+        for name in ('new_password1', 'new_password2'):
             self.fields[name].help_text = None
