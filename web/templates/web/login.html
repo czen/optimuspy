@@ -9,7 +9,7 @@
 {% endblock style %}
 {% block content %}
   <div class="mt-5">
-    <a role="button" class="btn btn-light btn-lg" href={% url 'index' %}>Назад</a>
+    <a role="button" class="btn btn-light btn-lg" onclick="history.back()">Назад</a>
   </div>
   <div class="h-100 d-flex align-items-center justify-content-center">
     <div class="container text-center text-white">
@@ -23,10 +23,10 @@
   </div>
   <div class="text-white text-center">
     Все еще нет аккаунта?
-    <a href="{% url 'signup' %}">Зарегистрироваться</a>
+    <a href="{% url 'signup' %}" class="text-white">Зарегистрироваться</a>
   </div>
   <div class="text-white text-center">
     Забыли пароль?
-    <a href="{% url 'password_reset' %}">Сбросить</a>
+    <a href="{% url 'password_reset' %}" class="text-white">Сбросить</a>
   </div>
 {% endblock content %}

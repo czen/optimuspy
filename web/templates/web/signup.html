@@ -9,7 +9,7 @@
 {% endblock style %}
 {% block content %}
   <div class="mt-5">
-    <a role="button" class="btn btn-light btn-lg" href={% url 'index' %}>Назад</a>
+    <a role="button" class="btn btn-light btn-lg" onclick="history.back()">Назад</a>
   </div>
   <div class="h-100 d-flex align-items-center justify-content-center">
     <div class="container text-center text-white">
@@ -23,6 +23,6 @@
   </div>
   <div class="text-white text-center">
     Уже есть аккаунт?
-    <a href="{% url 'login' %}">Войти</a>
+    <a href="{% url 'login' %}" class="text-white">Войти</a>
   </div>
 {% endblock content %}
