@@ -33,7 +33,20 @@ from web.tasks import compiler_job
 
 
 def index(request: HttpRequest):
+
     return render(request, 'web/index.html')
+
+
+@login_required
+def profile(request: HttpRequest):
+    context = {
+        'username': request.user.username,
+        'token': request.user.api.key,
+        'date': request.user.date_joined,
+        'login': request.user.last_login,
+        'email': request.user.email
+    }
+    return render(request, 'web/profile.html', context=context)
 
 
 @login_required

@@ -10,7 +10,9 @@
   <div class="mt-5 nav">
     <a role="button" class="btn btn-light btn-lg" href={% url 'submit' %}>Отправить</a>
     <div>
-      <p class="text-white text-center">{{ username }}</p>
+      <p class="text-center">
+        <a href={% url 'profile' %} class="text-white text-center">{{ username }}</a>
+      </p>
       <a role="button" class="btn btn-dark btn-sm" href={% url 'logout' %}>Выйти</a>
     </div>
   </div>

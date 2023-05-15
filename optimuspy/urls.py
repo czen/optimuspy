@@ -21,7 +21,8 @@ from django.contrib.auth.views import (PasswordChangeView,
                                        PasswordResetCompleteView,
                                        PasswordResetConfirmView,
                                        PasswordResetDoneView,
-                                       PasswordResetView)
+                                       PasswordResetView,
+                                       )
 from django.urls import path
 
 from web import views
@@ -35,6 +36,7 @@ urlpatterns = [
     path('accounts/login/', views.LogIn.as_view(), name='login'),
     path('accounts/signup/', views.SignUp.as_view(), name='signup'),
     path('accounts/logout/', views.ulogout, name='logout'),
+    path('accounts/profile/', views.profile, name='profile'),
     path('accounts/password_change/',
          PasswordChangeView.as_view(
              template_name='web/pwd/change.html',
