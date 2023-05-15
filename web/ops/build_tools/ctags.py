@@ -28,7 +28,9 @@ class Ctags:
         with sp.Popen(['ctags', '-R', '-f-', f'{self.path}'], stdout=sp.PIPE) as p:
             while line := p.stdout.readline():
                 name, path, sign, typ = line.decode().strip().split('\t')
-                self.lines.append(Line(name, path, sign.strip('/^$;"{'), typ))
+                sign = sign[:sign.index('{')]
+                sign = sign.strip('/^$;"')
+                self.lines.append(Line(name, path, sign, typ))
                 if name == 'main' and typ == 'f':
                     raise MainFoundException
 
