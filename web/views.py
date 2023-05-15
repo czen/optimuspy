@@ -434,6 +434,7 @@ def api_submit(request: HttpRequest):
     cflags = req.get('cflags')
     files = req.get('files')
     tests = req.get('tests')
+    additional_ops_args = req.get('additional_ops_args')
 
     # validate parameters presence
     if any(i is None for i in (token, comps, passes, cflags, files, tests)):
@@ -555,6 +556,8 @@ def api_submit(request: HttpRequest):
     task.compilers = comps
     task.passes = passes
     task.cflags = cflags
+    if additional_ops_args is not None:
+        task.additional_ops_args = additional_ops_args
     task.save()
 
     resp['error'] = False

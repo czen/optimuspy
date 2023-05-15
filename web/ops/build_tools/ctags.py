@@ -28,7 +28,8 @@ class Ctags:
         with sp.Popen(['ctags', '-R', '-f-', f'{self.path}'], stdout=sp.PIPE) as p:
             while line := p.stdout.readline():
                 name, path, sign, typ = line.decode().strip().split('\t')
-                sign = sign[:sign.index('{')]
+                if '{' in sign:
+                    sign = sign[:sign.index('{')]
                 sign = sign.strip('/^$;"')
                 self.lines.append(Line(name, path, sign, typ))
                 if name == 'main' and typ == 'f':

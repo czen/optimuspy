@@ -53,6 +53,10 @@ def compiler_job(task_id: int):
             # Run opsc pass
             _p = Passes(i)
             p: Pass = _p.obj(subdir.iterdir())
+
+            # Add additional ops args as requested by my scientific advisor
+            if task.additional_ops_args:
+                p.args.extend(task.additional_ops_args.split(' '))
             _ret = p.run()
             logger.info('%s finished with code %d', _p.name, _ret)
             if _ret != 0:
