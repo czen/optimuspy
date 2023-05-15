@@ -33,6 +33,7 @@
     ".venv": true,
     "db.sqlite3": true,
     ".gitmodules": true,
+    ".gitattributes": true,
     "opsc-bin": true,
     "catch2": true,
     "opsc": true,
