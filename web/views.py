@@ -571,7 +571,8 @@ def api_result(request: HttpRequest):
     resp = {
         'error': True,
         'status': 'success',
-        'benchmarks': []
+        'benchmarks': [],
+        'additional_ops_args' : ''
     }
 
     req: dict = json.loads(request.body)
@@ -612,6 +613,7 @@ def api_result(request: HttpRequest):
                 'error': b.error,
             }
         )
+    resp['additional_ops_args'] = task.additional_ops_args
     resp['error'] = False
     return JsonResponse(resp)
 
