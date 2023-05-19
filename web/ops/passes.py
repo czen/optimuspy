@@ -7,7 +7,7 @@ from django.conf import settings
 
 class Pass():
     '''Проход без аргументов. Не делает оптимизаций.'''
-    args: list[str] = []
+    args: list[str] = ['-backend=plain', '-flattice', '-fmontego']
     _c_files: list[Path]
 
     def __init__(self, c_files: list[Path]) -> None:
@@ -16,7 +16,7 @@ class Pass():
     def run(self) -> int:
         code = 0
         for file in self._c_files:
-            with sp.Popen([f'{settings.OPSC_PATH}/opsc', *self.args, f'{file}', '-o', f'{file}']) as p:
+            with sp.Popen([f'{settings.OPSC_PATH}/opsc', *self.args, '-o', f'{file}', f'{file}']) as p:
                 code = max(code, p.wait())
         return code
 

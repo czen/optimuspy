@@ -38,7 +38,7 @@ class Migration(migrations.Migration):
                 ('date', models.DateTimeField(auto_now_add=True)),
                 ('tests', models.PositiveSmallIntegerField()),
                 ('ready', models.BooleanField(default=False)),
-                ('additional_ops_args', models.CharField(max_length=80)),
+                ('additional_ops_args', models.CharField(max_length=500)),
                 ('_compilers', models.CharField(max_length=32)),
                 ('_cflags', models.CharField(max_length=32)),
                 ('_passes', models.CharField(max_length=32)),

@@ -6,6 +6,8 @@ services:
     # - db_data:/var/lib/postgresql/data
     env_file:
       - .env
+    ports:
+      - $DATABASE_PORT:5432
 
   rabbitmq:
     image: rabbitmq

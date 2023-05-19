@@ -1,0 +1,11 @@
+token: ############
+url: http://192.168.0.115:8111
+username: admin
+password: p1@7s0ap#
+settings:
+   compiler: 'GCC'
+   pass_name: 'NoOptPass'
+   cflags: 'O2'
+   additional_ops_args: ' -ftransforms=rename[optimus,main] '
+   after_ops_args: ' -ftransforms=rename[main,optimus] '
+   iterations: 10
