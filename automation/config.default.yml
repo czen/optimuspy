@@ -1,7 +1,7 @@
 token: ############
 url: http://192.168.0.115:8111
 username: admin
-password: p1@7s0ap#
+password: 11111
 settings:
    compiler: 'GCC'
    pass_name: 'NoOptPass'
