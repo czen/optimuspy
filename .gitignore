@@ -166,3 +166,5 @@ tasks/
 
 # misc. temporary files
 temp
+
+config.yml
