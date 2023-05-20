@@ -56,7 +56,10 @@ def compiler_job(task_id: int):
 
             # Add additional ops args as requested by my scientific advisor
             if task.additional_ops_args:
-                p.args.extend(task.additional_ops_args.split(' '))
+                # don't provide separator so it removes all extra spaces!!!
+                p.args = task.additional_ops_args.split() + p.args # put extra arguments in front
+                #p.args.extend(task.additional_ops_args.split(' '))
+            logger.info('%s will run with args %s', _p.name, ' '.join(p.args))
             _ret = p.run()
             logger.info('%s finished with code %d', _p.name, _ret)
             if _ret != 0:
