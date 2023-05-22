@@ -16,7 +16,7 @@ class Pass():
     def run(self) -> int:
         code = 0
         for file in self._c_files:
-            with sp.Popen([f'{settings.OPSC_PATH}/opsc', *self.args, '-o', f'{file}', f'{file}']) as p:
+            with sp.Popen([f'{settings.OPSC_PATH}/opsc', *self.args, *settings.INCLUDES, '-o', f'{file}', f'{file}']) as p:
                 code = max(code, p.wait())
         return code
 

@@ -173,6 +173,9 @@ CELERY_BROKER_URL = 'amqp://guest@rabbitmq'
 
 OPSC_PATH = (BASE_DIR / 'opsc').resolve()
 
+# Пути включения стандартной библиотеки (cpp -v)
+INCLUDES = ['-I=/usr/lib/gcc/x86_64-linux-gnu/11/include', '-I=/usr/local/include',
+            '-I=/usr/include/x86_64-linux-gnu', '-I=/usr/include']
 
 # -----------
 # Компиляторы
