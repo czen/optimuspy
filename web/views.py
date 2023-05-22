@@ -34,7 +34,7 @@ from web.tasks import compiler_job
 
 def index(request: HttpRequest):
 
-    return render(request, 'web/index.html')
+    return render(request, 'index.html')
 
 
 @login_required
@@ -46,7 +46,7 @@ def profile(request: HttpRequest):
         'last_login': request.user.last_login,
         'email': request.user.email
     }
-    return render(request, 'web/profile.html', context=context)
+    return render(request, 'profile.html', context=context)
 
 
 @login_required
@@ -56,7 +56,7 @@ def ulogout(request: HttpRequest):
 
 
 class LogIn(LoginView):
-    template_name = 'web/login.html'
+    template_name = 'login.html'
     fields = '__all__'
     redirect_authenticated_user = True
 
@@ -71,7 +71,7 @@ class LogIn(LoginView):
 
 
 class SignUp(FormView):
-    template_name = 'web/signup.html'
+    template_name = 'signup.html'
     form_class = SignUpForm
     redirect_authenticated_user = True
     success_url = reverse_lazy('list')
@@ -99,7 +99,7 @@ def tasks_list(request: HttpRequest):
         'tasks': Task.objects.filter(user=request.user).order_by('-date'),
         'msg': msg
     }
-    return render(request, 'web/list.html', context=context)
+    return render(request, 'list.html', context=context)
 
 
 @login_required
@@ -126,7 +126,7 @@ def tasks_submit(request: HttpRequest):
             return redirect('list')
     else:
         form = SubmitForm(request.user)
-    return render(request, 'web/submit.html', {'form': form})
+    return render(request, 'submit.html', {'form': form})
 
 
 @login_required
@@ -161,7 +161,7 @@ def tasks_signature(request: HttpRequest, th: str):
     else:
         form = SignatureChoiceForm(choices)
 
-    return render(request, 'web/signature.html', {'form': form})
+    return render(request, 'signature.html', {'form': form})
 
 
 def md5sum(path: Path, chunk_size: int = 4096) -> str:
@@ -276,13 +276,13 @@ def tasks_result(request: HttpRequest, th: str):
             'downloads': q2,
             'th': task.hash
         }
-        return render(request, 'web/result_ready.html', context=context)
+        return render(request, 'result_ready.html', context=context)
     else:
         context = {
             'th': task.hash,
             'timeout': 10000
         }
-        return render(request, 'web/result_wait.html', context=context)
+        return render(request, 'result_wait.html', context=context)
 
 
 def tasks_ready(_: HttpRequest, th: str):

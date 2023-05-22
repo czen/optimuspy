@@ -1,8 +1,8 @@
-{% extends "web/base.html" %}
+{% extends "base.html" %}
 {% load crispy_forms_tags %}
 {% load static %}
 {% block title %}
-  Вход
+  Регистрация
 {% endblock title %}
 {% block style %}
   <link rel="stylesheet" type="text/css" href="{% static 'css/login.css' %}" />
@@ -13,7 +13,7 @@
   </div>
   <div class="h-100 d-flex align-items-center justify-content-center">
     <div class="container text-center text-white">
-      <h2 class="lab">Войти</h2>
+      <h2 class="lab">Регистрация</h2>
       <form method="post">
         {% csrf_token %}
         {{ form|crispy }}
@@ -22,11 +22,7 @@
     </div>
   </div>
   <div class="text-white text-center">
-    Все еще нет аккаунта?
-    <a href="{% url 'signup' %}" class="text-white">Зарегистрироваться</a>
-  </div>
-  <div class="text-white text-center">
-    Забыли пароль?
-    <a href="{% url 'password_reset' %}" class="text-white">Сбросить</a>
+    Уже есть аккаунт?
+    <a href="{% url 'login' %}" class="text-white">Войти</a>
   </div>
 {% endblock content %}

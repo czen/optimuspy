@@ -39,21 +39,21 @@ urlpatterns = [
     path('accounts/profile/', views.profile, name='profile'),
     path('accounts/password_change/',
          PasswordChangeView.as_view(
-             template_name='web/pwd/change.html',
+             template_name='pwd/change.html',
              success_url='/tasks/', form_class=PasswordChangeF
          ), name='password_change'),
     path('accounts/password_reset/',
          PasswordResetView.as_view(
-             template_name='web/pwd/reset.html'), name='password_reset'),
+             template_name='pwd/reset.html'), name='password_reset'),
     path('accounts/password_reset/done/',
          PasswordResetDoneView.as_view(
-             template_name='web/pwd/reset_done.html'), name='password_reset_done'),
+             template_name='pwd/reset_done.html'), name='password_reset_done'),
     path('accounts/password_reset/confirm/<uidb64>/<token>/',
          PasswordResetConfirmView.as_view(
-             template_name='web/pwd/reset_confirm.html', form_class=SetPasswordF), name='password_reset_confirm'),
+             template_name='pwd/reset_confirm.html', form_class=SetPasswordF), name='password_reset_confirm'),
     path('password/password_reset/complete/',
          PasswordResetCompleteView.as_view(
-             template_name='web/pwd/reset_complete.html'), name='password_reset_complete'),
+             template_name='pwd/reset_complete.html'), name='password_reset_complete'),
     path('tasks/', views.tasks_list, name='list'),
     path('tasks/submit/', views.tasks_submit, name='submit'),
     path('tasks/<str:th>/result', views.tasks_result, name='result'),
