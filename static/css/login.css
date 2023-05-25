@@ -15,8 +15,12 @@ body {
     margin-bottom: 5%;
 }
 
-.btn-m {
+.mt5 {
     margin-top: 5%;
+}
+
+.mt2 {
+    margin-top: 2%;
 }
 
 input {

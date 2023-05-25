@@ -17,7 +17,10 @@
       <form method="post">
         {% csrf_token %}
         {{ form|crispy }}
-        <button type="submit" class="btn btn-dark btn-lg btn-m">Готово</button>
+        <button type="submit" class="btn btn-dark btn-lg mt2">Готово</button>
+        <div class="mt2">
+          <a href="{% url 'social:begin' 'github' %}" class="text-white">Войти через GitHub</a>
+        </div>
       </form>
     </div>
   </div>

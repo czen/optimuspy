@@ -23,7 +23,7 @@ from django.contrib.auth.views import (PasswordChangeView,
                                        PasswordResetDoneView,
                                        PasswordResetView,
                                        )
-from django.urls import path
+from django.urls import path, include
 
 from web import views
 from web.forms import PasswordChangeF, SetPasswordF
@@ -33,6 +33,7 @@ from web.forms import PasswordChangeF, SetPasswordF
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.index, name='index'),
+    path('oauth/', include('social_django.urls', namespace='social')),
     path('accounts/login/', views.LogIn.as_view(), name='login'),
     path('accounts/signup/', views.SignUp.as_view(), name='signup'),
     path('accounts/logout/', views.ulogout, name='logout'),

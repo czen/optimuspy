@@ -2,6 +2,7 @@ django
 django-bootstrap-v5
 crispy-bootstrap5
 django-crispy-forms
+social-auth-app-django
 python-decouple
 Celery
 django-extensions
