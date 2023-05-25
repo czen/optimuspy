@@ -2,8 +2,8 @@ version: "3.9"
 services:
   db:
     image: postgres
-    # volumes:
-    # - db_data:/var/lib/postgresql/data
+    volumes:
+      - db_data:/var/lib/postgresql/data
     env_file:
       - .env
     ports:
@@ -26,9 +26,8 @@ services:
     entrypoint: /bin/sh
     command: scripts/entrypoint.sh
     volumes:
-      - ./optimuspy:/optimuspy/optimuspy
-      - ./static:/optimuspy/static
       - ./web:/optimuspy/web
+      - ./optimuspy:/optimuspy/optimuspy
       - static_files:/var/www/optimuspy/static
     depends_on:
       - db
@@ -38,3 +37,4 @@ services:
 
 volumes:
   static_files:
+  db_data:

@@ -1,12 +1,12 @@
 import base64 as b64
+import binascii
 import csv
 import json
+import tarfile
 from hashlib import md5
-from io import StringIO, BytesIO
+from io import BytesIO, StringIO
 from math import pi
 from pathlib import Path
-import binascii
-import tarfile
 
 from bokeh.embed import components
 from bokeh.models import ColumnDataSource, HoverTool
@@ -80,7 +80,7 @@ class SignUp(FormView):
         user = form.save()
 
         if user is not None:
-            login(self.request, user)
+            login(self.request, user, backend='django.contrib.auth.backends.ModelBackend')
 
         return super(SignUp, self).form_valid(form)
 
@@ -572,7 +572,7 @@ def api_result(request: HttpRequest):
         'error': True,
         'status': 'success',
         'benchmarks': [],
-        'additional_ops_args' : ''
+        'additional_ops_args': ''
     }
 
     req: dict = json.loads(request.body)
