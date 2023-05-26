@@ -19,7 +19,7 @@ COPY ./opsc /optimuspy/opsc
 COPY ./catch2 /optimuspy/catch2
 WORKDIR /optimuspy/opsc-bin
 
-RUN tar xf opsc.tar.xz
+RUN cat opsc.tar.xz.part* | tar xJ
 RUN mv lib/* /usr/local/lib/
 RUN mv opsc /optimuspy/opsc
 RUN rmdir lib

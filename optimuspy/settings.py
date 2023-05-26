@@ -59,11 +59,14 @@ SOCIAL_AUTH_JSONFIELD_ENABLED = True
 
 AUTHENTICATION_BACKENDS = [
     'social_core.backends.github.GithubOAuth2',
+    'social_core.backends.gitlab.GitLabOAuth2',
     'django.contrib.auth.backends.ModelBackend',
 ]
 
 SOCIAL_AUTH_GITHUB_KEY = config('SOCIAL_AUTH_GITHUB_KEY')
 SOCIAL_AUTH_GITHUB_SECRET = config('SOCIAL_AUTH_GITHUB_SECRET')
+SOCIAL_AUTH_GITLAB_KEY = config('SOCIAL_AUTH_GITLAB_KEY')
+SOCIAL_AUTH_GITLAB_SECRET = config('SOCIAL_AUTH_GITLAB_SECRET')
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

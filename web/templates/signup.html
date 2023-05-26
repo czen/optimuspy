@@ -19,7 +19,18 @@
         {{ form|crispy }}
         <button type="submit" class="btn btn-dark btn-lg mt2">Готово</button>
         <div class="mt2">
-          <a href="{% url 'social:begin' 'github' %}" class="text-white">Войти через GitHub</a>
+          <a href="{% url 'social:begin' 'github' %}">
+            <img src="{% static 'images/github.svg' %}"
+                 alt="github"
+                 height="5%"
+                 width="5%" />
+          </a>
+          {% comment %} <a href="{% url 'social:begin' 'gitlab' %}">
+            <img src="{% static 'images/gitlab.svg' %}"
+                 alt="gitlab"
+                 height="7%"
+                 width="7%" />
+          </a> {% endcomment %}
         </div>
       </form>
     </div>
