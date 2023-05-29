@@ -19,6 +19,7 @@ WORKDIR /optimuspy/opsc-bin
 RUN cat opsc.tar.xz.part* | tar xJ
 RUN mv lib/* /usr/local/lib/
 RUN mv opsc /optimuspy/opsc
+RUN rm opsc.tar.xz.part*
 RUN rmdir lib
 
 WORKDIR /optimuspy/opsc
