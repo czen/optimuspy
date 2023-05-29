@@ -41,6 +41,7 @@ CSRF_TRUSTED_ORIGINS = [
 # Application definition
 
 INSTALLED_APPS = [
+    'daphne',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -106,7 +107,7 @@ CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'channels_rabbitmq.core.RabbitmqChannelLayer',
         'CONFIG': {
-            'host': 'amqp://guest@rabbitmq',
+            'host': 'amqp://guest:guest@rabbitmq',
         },
     },
 }

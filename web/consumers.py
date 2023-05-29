@@ -9,7 +9,7 @@ class TaskReadyConsumer(AsyncWebsocketConsumer):
             'ready', self.channel_name
         )
         # Accept connection
-        # self.accept()
+        await self.accept()
 
     async def disconnect(self, code):
         """Disconnect channel 'self.channel_name' from 'ready' group"""
