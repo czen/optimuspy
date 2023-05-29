@@ -54,5 +54,4 @@ RUN chown -R optimuspy:optimuspy .
 # Switch to user
 USER ${uid}:${gid}
 
-
 RUN mkdir -p tasks

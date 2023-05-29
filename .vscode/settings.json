@@ -49,5 +49,5 @@
   ],
   "python.testing.pytestEnabled": false,
   "python.testing.unittestEnabled": true,
-  // "files.eol": "\n"
+  "files.eol": "\n"
 }
