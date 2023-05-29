@@ -8,5 +8,5 @@ Celery
 django-extensions
 bokeh
 psycopg2
-channels['daphne']
+channels [daphne]
 channels-rabbitmq
