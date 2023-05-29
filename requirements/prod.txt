@@ -8,5 +8,6 @@ Celery
 django-extensions
 bokeh
 psycopg2
-channels [daphne]
+uvicorn [standard]
+channels
 channels-rabbitmq

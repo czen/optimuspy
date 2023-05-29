@@ -4,5 +4,4 @@
 python3 manage.py wait_for_db &&
 python3 manage.py migrate
 celery -A optimuspy worker --concurrency 1 -P solo --loglevel=info &
-# daphne -b 0.0.0.0 -p 8000 optimuspy.asgi:application
-python3 manage.py runserver 0.0.0.0:8000
+uvicorn optimuspy.asgi:application --host 0.0.0.0 --port 8000
