@@ -280,7 +280,6 @@ def tasks_result(request: HttpRequest, th: str):
     else:
         context = {
             'th': task.hash,
-            'timeout': 10000
         }
         return render(request, 'result_wait.html', context=context)
 

@@ -32,6 +32,16 @@
                 "--concurrency",
                 "1"
             ]
-        }
+        },
+        {
+            "name": "Python: Daphne",
+            "type": "python",
+            "request": "launch",
+            "module": "daphne",
+            "console": "integratedTerminal",
+            "args": [
+                "optimuspy.asgi:application",
+            ]
+        },
     ]
 }

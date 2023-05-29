@@ -99,8 +99,17 @@ TEMPLATES = [
     },
 ]
 
+ASGI_APPLICATION = 'optimuspy.asgi.application'
 WSGI_APPLICATION = 'optimuspy.wsgi.application'
 
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_rabbitmq.core.RabbitmqChannelLayer',
+        'CONFIG': {
+            'host': 'amqp://guest:guest@rabbitmq',
+        },
+    },
+}
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases

@@ -59,7 +59,6 @@ urlpatterns = [
     path('tasks/submit/', views.tasks_submit, name='submit'),
     path('tasks/<str:th>/result', views.tasks_result, name='result'),
     path('tasks/<str:th>/signature/', views.tasks_signature, name='signature'),
-    path('tasks/<str:th>/ready/', views.tasks_ready, name='ready'),
     path('tasks/<str:th>/stats/', views.tasks_stats, name='stats'),
     path('download/<int:rid>/', views.result_download, name='download'),
     path('api/auth/', views.api_auth, name='api_auth'),

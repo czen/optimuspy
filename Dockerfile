@@ -11,14 +11,11 @@ RUN useradd -u ${uid} -g ${group} -s /bin/sh -m ${user}
 RUN mkdir optimuspy
 
 WORKDIR /optimuspy
-
-COPY ./scripts scripts
-
 COPY ./opsc-bin /optimuspy/opsc-bin
 COPY ./opsc /optimuspy/opsc
 COPY ./catch2 /optimuspy/catch2
-WORKDIR /optimuspy/opsc-bin
 
+WORKDIR /optimuspy/opsc-bin
 RUN cat opsc.tar.xz.part* | tar xJ
 RUN mv lib/* /usr/local/lib/
 RUN mv opsc /optimuspy/opsc
@@ -40,6 +37,7 @@ RUN pip3 install -r requirements/prod.txt
 
 COPY ./optimuspy /optimuspy/optimuspy
 COPY ./scripts /optimuspy/scripts
+
 COPY ./static /optimuspy/static
 COPY ./web /optimuspy/web
 COPY ./.env /optimuspy/.env

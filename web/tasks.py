@@ -4,17 +4,33 @@ import tarfile
 from os import chdir, getcwd
 from pathlib import Path
 
+import msgpack
 from celery.utils.log import get_logger
 
 from optimuspy import celery_app
-from web.models import Benchmark, Result, Task, CompError
+from web.models import Benchmark, CompError, Result, Task
 from web.ops.build_tools import catch2
 from web.ops.compilers import Compiler, Compilers
 from web.ops.passes import Pass, Passes
 
 logger = get_logger(__name__)
+# channel_layer = get_channel_layer()
 
 # pylint: disable=broad-exception-caught
+
+
+def publish_message_to_group(message, group: str) -> None:
+    with celery_app.producer_pool.acquire(block=True) as producer:
+        producer.publish(
+            msgpack.packb({
+                "__asgi_group__": group,
+                **message,
+            }),
+            exchange="groups",  # groups_exchange
+            content_encoding="binary",
+            routing_key=group,
+            retry=False,  # Channel Layer at-most once semantics
+        )
 
 
 @celery_app.task
@@ -57,8 +73,8 @@ def compiler_job(task_id: int):
             # Add additional ops args as requested by my scientific advisor
             if task.additional_ops_args:
                 # don't provide separator so it removes all extra spaces!!!
-                p.args = task.additional_ops_args.split() + p.args # put extra arguments in front
-                #p.args.extend(task.additional_ops_args.split(' '))
+                p.args = task.additional_ops_args.split() + p.args  # put extra arguments in front
+                # p.args.extend(task.additional_ops_args.split(' '))
             logger.info('%s will run with args %s', _p.name, ' '.join(p.args))
             _ret = p.run()
             logger.info('%s finished with code %d', _p.name, _ret)
@@ -159,4 +175,5 @@ def compiler_job(task_id: int):
 
     task.ready = True
     task.save()
+    publish_message_to_group({'type': 'ready.announce', 'task': task.hash}, 'ready')
     logger.info('Finished execution of task %s', task.id)

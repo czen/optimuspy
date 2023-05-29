@@ -9,24 +9,16 @@
         href="{% static 'css/result_wait.css' %}" />
 {% endblock style %}
 {% block content %}
-  <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
   <script type="text/javascript">
-  $(document).ready(function () {
-    get_results();
-});
-
-function get_results() {
-  $.ajax({
-      type: 'GET',
-      url: "/tasks/{{ th }}/ready",
-      success: function (json) {
-          if (json.ready)
-              location.reload();
-          else
-              setTimeout(function () { get_results(); }, {{ timeout }});
-      }
-  });
-}
+    const ws = new WebSocket(
+      'ws://' + window.location.host + '/ws/ready/'
+    )
+    ws.onmessage = (event) => {
+      const data = event.data;
+      console.log(data);
+      if (data == "{{ th }}")
+        location.reload();
+    }
   </script>
   <div class="mt-5 nav">
     <a role="button" class="btn btn-light btn-lg" onclick="history.back()">Назад</a>
