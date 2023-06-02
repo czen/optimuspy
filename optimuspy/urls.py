@@ -67,5 +67,6 @@ urlpatterns = [
     path('api/tasks/', views.api_tasks, name='api_tasks'),
     path('api/submit/', views.api_submit, name='api_submit'),
     path('api/result/', views.api_result, name='api_result'),
-    path('api/download/', views.api_download, name='api_download')
+    path('api/download/', views.api_download, name='api_download'),
+    path('api/cpuinfo/', views.api_cpuinfo, name='api_cpuinfo')
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

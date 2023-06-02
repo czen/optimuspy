@@ -5,7 +5,7 @@ from pathlib import Path
 from django.conf import settings
 
 
-class Pass():
+class Pass:
     '''Проход без аргументов. Не делает оптимизаций.'''
     args: list[str] = ['-backend=plain', '-flattice', '-fmontego']
     _c_files: list[Path]

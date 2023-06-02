@@ -11,3 +11,4 @@ psycopg2
 uvicorn [standard]
 channels
 channels-rabbitmq
+py-cpuinfo

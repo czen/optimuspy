@@ -51,6 +51,7 @@ class Task(models.Model):
     tests = models.PositiveSmallIntegerField()
     ready = models.BooleanField(default=False)
     additional_ops_args = models.CharField(max_length=500)
+    cpuinfo = models.CharField(max_length=80)
     _compilers = models.CharField(max_length=32)
     _cflags = models.CharField(max_length=32)
     _passes = models.CharField(max_length=32)

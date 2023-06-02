@@ -676,3 +676,14 @@ class DownloadTests(TestCase):
             self.assertEqual(json['file'], '')
         except requests.Timeout:
             self.fail('timeout')
+
+
+class CPUInfoTests(TestCase):
+    def test_cpuinfo(self):
+        try:
+            r = requests.post('http://localhost:8000/api/cpuinfo/', timeout=60)
+            json = r.json()
+            self.assertNotEqual(json, {})
+            self.assertTrue('brand_raw' in json)
+        except requests.Timeout:
+            self.fail('timeout')

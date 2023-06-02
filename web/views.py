@@ -11,6 +11,7 @@ from pathlib import Path
 from bokeh.embed import components
 from bokeh.models import ColumnDataSource, HoverTool
 from bokeh.plotting import figure
+from cpuinfo import get_cpu_info
 from django.conf import settings
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
@@ -274,6 +275,7 @@ def tasks_result(request: HttpRequest, th: str):
             'username': request.user.username,
             'script': script, 'div': div,
             'downloads': q2,
+            'machine': task.cpuinfo,
             'th': task.hash
         }
         return render(request, 'result_ready.html', context=context)
@@ -571,7 +573,8 @@ def api_result(request: HttpRequest):
         'error': True,
         'status': 'success',
         'benchmarks': [],
-        'additional_ops_args': ''
+        'additional_ops_args': '',
+        'machine': ''
     }
 
     req: dict = json.loads(request.body)
@@ -613,6 +616,7 @@ def api_result(request: HttpRequest):
             }
         )
     resp['additional_ops_args'] = task.additional_ops_args
+    resp['machine'] = task.cpuinfo
     resp['error'] = False
     return JsonResponse(resp)
 
@@ -673,3 +677,8 @@ def api_download(request: HttpRequest):
     resp['error'] = False
     resp['file'] = b64.b64encode(data.getbuffer()).decode('utf-8')
     return JsonResponse(resp)
+
+
+@csrf_exempt
+def api_cpuinfo(request: HttpRequest):
+    return JsonResponse(get_cpu_info())

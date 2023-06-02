@@ -6,6 +6,7 @@ from pathlib import Path
 
 import msgpack
 from celery.utils.log import get_logger
+from cpuinfo import get_cpu_info
 
 from optimuspy import celery_app
 from web.models import Benchmark, CompError, Result, Task
@@ -173,6 +174,8 @@ def compiler_job(task_id: int):
         else:
             shutil.rmtree(file)
 
+    # Store info about worker's CPU
+    task.cpuinfo = get_cpu_info()['brand_raw']
     task.ready = True
     task.save()
     publish_message_to_group({'type': 'ready.announce', 'task': task.hash}, 'ready')
