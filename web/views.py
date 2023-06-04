@@ -272,7 +272,6 @@ def tasks_result(request: HttpRequest, th: str):
         script, div = components(plot)
 
         context = {
-            'username': request.user.username,
             'script': script, 'div': div,
             'downloads': q2,
             'machine': task.cpuinfo,
