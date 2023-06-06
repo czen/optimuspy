@@ -22,7 +22,7 @@ from django.urls import reverse_lazy
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic.edit import FormView
 
-from web.forms import SignatureChoiceForm, SignUpForm, SubmitForm
+from web.forms import SignatureChoiceForm, SignUpForm, SubmitForm, ThemeForm
 from web.models import API, Benchmark, CompError, Result, Task, User
 from web.ops.build_tools.ctags import Ctags, MainFoundException
 from web.ops.compilers import (Compiler, Compilers, GenericCflags,
@@ -50,13 +50,26 @@ def index(request: HttpRequest):
 @login_required
 def profile(request: HttpRequest):
     context = {
-        'username': request.user.username,
-        'token': request.user.api.key,
-        'date_joined': request.user.date_joined,
-        'last_login': request.user.last_login,
-        'email': request.user.email
-    } | theme(request)
-    return render(request, 'profile.html', context=context)
+            'username': request.user.username,
+            'token': request.user.api.key,
+            'date_joined': request.user.date_joined,
+            'last_login': request.user.last_login,
+            'email': request.user.email
+    }
+    if request.method == 'POST':
+        _theme = {'theme': request.POST['choice']}
+        context |= {
+            'form': ThemeForm(_theme),
+        } | _theme
+        resp = render(request, 'profile.html', context=context)
+        resp.set_cookie('theme', _theme['theme'])
+        return resp
+    else:
+        _theme = theme(request)
+        context |= {
+            'form': ThemeForm(_theme),
+        } | _theme
+        return render(request, 'profile.html', context=context)
 
 
 @login_required
@@ -290,12 +303,12 @@ def tasks_result(request: HttpRequest, th: str):
             'downloads': q2,
             'machine': task.cpuinfo,
             'th': task.hash
-        } + theme(request)
+        } | theme(request)
         return render(request, 'result_ready.html', context=context)
     else:
         context = {
             'th': task.hash,
-        } + theme(request)
+        } | theme(request)
         return render(request, 'result_wait.html', context=context)
 
 

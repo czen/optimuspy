@@ -1,14 +1,15 @@
-from typing import Any, Optional
+
 from crispy_forms.bootstrap import InlineCheckboxes
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Fieldset, Layout, Submit
+from crispy_forms.layout import Div, Fieldset, Layout, Submit
 from django import forms
 from django.conf import settings
-from django.contrib.auth.base_user import AbstractBaseUser
-from django.contrib.auth.forms import UserCreationForm, PasswordChangeForm, SetPasswordForm
+from django.contrib.auth.forms import (PasswordChangeForm, SetPasswordForm,
+                                       UserCreationForm)
+
+from web.models import Task, User
 from web.ops.compilers import SubmitFormCflags
 from web.ops.passes import Passes
-from web.models import User, Task
 
 
 class MultipleFileInput(forms.ClearableFileInput):
@@ -112,3 +113,20 @@ class SetPasswordF(SetPasswordForm):
         super().__init__(*args, **kwargs)
         for name in ('new_password1', 'new_password2'):
             self.fields[name].help_text = None
+
+
+class ThemeForm(forms.Form):
+    choice = forms.CharField(label='Тема', widget=forms.Select(choices=[
+        ('dark', 'Темная'),
+        ('light', 'Светлая')
+    ]), required=False)
+
+    def __init__(self, cookie: dict[str, str], *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['choice'].initial = cookie['theme']
+        self.helper = FormHelper()
+        self.helper.layout = Layout(
+            Div(
+            'choice',
+            Submit('submit', 'Применить', css_class='btn btn-dark btn-m mt-3'), css_class='d-flex align-items-center justify-content-center')
+        )
