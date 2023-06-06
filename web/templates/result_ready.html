@@ -4,7 +4,9 @@
   Просмотр
 {% endblock title %}
 {% block style %}
-  <link rel="stylesheet" type="text/css" href="{% static 'css/main.css' %}" />
+  <link rel="stylesheet"
+        type="text/css"
+        href="{% static '' %}css/{{ theme }}/main.css" />
   <link href="https://cdn.pydata.org/bokeh/release/bokeh-3.1.0.min.css"
         rel="stylesheet"
         type="text/css">

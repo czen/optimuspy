@@ -33,6 +33,15 @@ from web.tasks import compiler_job
 # Create your views here.
 
 
+def theme(request: HttpRequest):
+    theme_id = request.COOKIES.get('theme')
+    match theme_id:
+        case None:
+            return {'theme': 'dark'}  # default: dark
+        case _:
+            return {'theme': theme_id}
+
+
 def index(request: HttpRequest):
 
     return render(request, 'index.html')
@@ -46,7 +55,7 @@ def profile(request: HttpRequest):
         'date_joined': request.user.date_joined,
         'last_login': request.user.last_login,
         'email': request.user.email
-    }
+    } | theme(request)
     return render(request, 'profile.html', context=context)
 
 
@@ -99,7 +108,7 @@ def tasks_list(request: HttpRequest):
         'username': request.user.username,
         'tasks': Task.objects.filter(user=request.user).order_by('-date'),
         'msg': msg
-    }
+    } | theme(request)
     return render(request, 'list.html', context=context)
 
 
@@ -127,7 +136,10 @@ def tasks_submit(request: HttpRequest):
             return redirect('list')
     else:
         form = SubmitForm(request.user)
-    return render(request, 'submit.html', {'form': form})
+    context = {
+        'form': form
+    } | theme(request)
+    return render(request, 'submit.html', context=context)
 
 
 @login_required
@@ -161,8 +173,10 @@ def tasks_signature(request: HttpRequest, th: str):
             return redirect('list')
     else:
         form = SignatureChoiceForm(choices)
-
-    return render(request, 'signature.html', {'form': form})
+    context = {
+        'form': form
+    } | theme(request)
+    return render(request, 'signature.html', context=context)
 
 
 def md5sum(path: Path, chunk_size: int = 4096) -> str:
@@ -276,12 +290,12 @@ def tasks_result(request: HttpRequest, th: str):
             'downloads': q2,
             'machine': task.cpuinfo,
             'th': task.hash
-        }
+        } + theme(request)
         return render(request, 'result_ready.html', context=context)
     else:
         context = {
             'th': task.hash,
-        }
+        } + theme(request)
         return render(request, 'result_wait.html', context=context)
 
 

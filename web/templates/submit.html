@@ -5,7 +5,9 @@
   Отправка
 {% endblock title %}
 {% block style %}
-  <link rel="stylesheet" type="text/css" href="{% static 'css/main.css' %}" />
+  <link rel="stylesheet"
+        type="text/css"
+        href="{% static '' %}css/{{ theme }}/main.css" />
 {% endblock style %}
 {% block content %}
   <div class="mt-5 nav">
