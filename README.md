@@ -131,9 +131,7 @@ void optimus()
     {
         for (int j = 0; j < N; j++)
         {
-            a[i * N + j] = 1;
-            b[i * N + j] = 2;
-            c[i * N + j] = 0;
+            // ...
         }
     }
     volatile float r = matmul(a, N, N, b, N, N, c);
@@ -151,4 +149,4 @@ void optimus()
 
 ![](https://raw.githubusercontent.com/COOLIRON2311/opsc-bin/master/images/4.png)
 
-Со сценариями использования сервиса при взаимодействии с интерфейсом прикладного программирования можно ознакомиться в [модульных тестах сервиса](web/tests.py) и [модуле automation](automation).
+Со сценариями использования сервиса при взаимодействии с интерфейсом прикладного программирования можно ознакомиться в [модульных тестах проекта](web/tests.py) и в [модуле automation](automation).
