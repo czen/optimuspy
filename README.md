@@ -29,10 +29,10 @@
 - [и другие](requirements/)
 
 ## Структура базы данных
-![](opsc-bin/images/1.png)
+![](https://raw.githubusercontent.com/COOLIRON2311/opsc-bin/master/images/1.png)
 
 ## Архитектура и состав модулей
-![](opsc-bin/images/2.png)
+![](https://raw.githubusercontent.com/COOLIRON2311/opsc-bin/master/images/2.png)
 
 ## Развертывание
 Для развертывания сервера прежде всего необходимо скачать дистрибутив приложения. Это можно сделать при помощи системы контроля версий **git**:
@@ -145,10 +145,10 @@ void optimus()
 
 Зададим следующие параметры:
 
-![](opsc-bin/images/3.png)
+![](https://raw.githubusercontent.com/COOLIRON2311/opsc-bin/master/images/3.png)
 
 После завершения процесса выполнения экспериментов, пользователь попадает на страницу с результатами их проведения.
 
-![](opsc-bin/images/4.png)
+![](https://raw.githubusercontent.com/COOLIRON2311/opsc-bin/master/images/4.png)
 
 Со сценариями использования сервиса при взаимодействии с интерфейсом прикладного программирования можно ознакомиться в [модульных тестах сервиса](web/tests.py) и [модуле automation](automation).
