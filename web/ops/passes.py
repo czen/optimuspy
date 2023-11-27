@@ -28,7 +28,8 @@ class OMPPass(Pass):
 
 class TilingPass(Pass):
     '''Проход с Tiling бэкендом'''
-    args = ['-backend=tiling', '-flattice', '-fmontego', '-rtails']
+    #args = ['-backend=tiling', '-flattice', '-fmontego', '-rtails']
+    args = ['-backend=wavefront']
 
 
 class Passes(Enum):

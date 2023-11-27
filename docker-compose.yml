@@ -24,7 +24,7 @@ services:
   web:
     build: .
     entrypoint: /bin/sh
-    command: scripts/entrypoint.sh
+    command: /optimuspy/scripts/entrypoint.sh
     volumes:
       - ./web:/optimuspy/web
       - ./optimuspy:/optimuspy/optimuspy

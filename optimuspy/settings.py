@@ -17,6 +17,8 @@ from decouple import config
 from web.ops.compilers import Compilers
 from web.ops.passes import Passes
 
+FORCE_SCRIPT_NAME = '/optimuspy'
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -36,6 +38,8 @@ CSRF_TRUSTED_ORIGINS = [
     'http://127.0.0.1:8000',
     'http://192.168.0.115:8111',
     'http://optimuspy.ru',
+    'http://testops',
+    'http://opsgroup.ru'
 ]
 
 # Application definition
