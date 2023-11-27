@@ -1,7 +1,7 @@
 #!/bin/bash
 mkdir -p opsc-bin
 mkdir -p opsc-bin/artifacts
-docker container rum ops-cli-files
+docker container rm ops-cli-files
 docker create --name ops-cli-files ops-group/ops-cli:latest
 docker cp ops-cli-files:/home/user/Lib/llvm-3.3.install/lib opsc-bin/artifacts/llvm-lib
 docker cp ops-cli-files:/home/user/ops-build/lib opsc-bin/artifacts/ops-lib
