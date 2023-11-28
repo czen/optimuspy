@@ -1,5 +1,7 @@
 FROM cooliron/optimuspy:base
 
+RUN apt-get update && apt-get install -y libomp-dev
+
 # Set user and group
 ARG user=optimuspy
 ARG group=optimuspy
@@ -49,8 +51,6 @@ RUN python3 manage.py collectstatic
 WORKDIR /optimuspy
 
 RUN chown -R optimuspy:optimuspy .
-
-RUN apt-get update && apt-get install -y libomp-dev
 
 # Switch to user
 USER ${uid}:${gid}
