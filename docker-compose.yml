@@ -20,6 +20,17 @@ services:
       - $FRONTEND_PORT:80
     depends_on:
       - web
+   # TODO: put into dev config!
+   # labels:
+   #   - "traefik.http.routers.optimuspy.rule=Host(`optimuspy.docker.localhost`)"
+   #   - "traefik.http.services.optimuspy.loadbalancer.server.port=80"
+   #   - "traefik.docker.network=traefik_default"
+   # networks:
+   #   - web
+   #   - default
+   # extra_hosts:
+   #   - host.docker.internal:host-gateway
+
 
   web:
     build: .
@@ -40,3 +51,10 @@ volumes:
   static_files:
   task_files:
   db_data:
+
+# TODO: put into dev config!
+#networks:
+#  web:
+#    external:
+#      name: traefik_default
+

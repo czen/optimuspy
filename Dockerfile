@@ -50,6 +50,8 @@ WORKDIR /optimuspy
 
 RUN chown -R optimuspy:optimuspy .
 
+RUN apt-get update && apt-get install -y libomp-dev
+
 # Switch to user
 USER ${uid}:${gid}
 

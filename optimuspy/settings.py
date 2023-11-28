@@ -40,6 +40,7 @@ CSRF_TRUSTED_ORIGINS = [
     'http://optimuspy.ru',
     'http://testops',
     'http://opsgroup.ru'
+    'http://optimuspy.docker.localhost'
 ]
 
 # Application definition
@@ -226,7 +227,7 @@ if not COMPILERS:
 # Проходы OPS
 # -----------
 OPS_PASSES = [
-    Passes.NoOptPass, Passes.OMPPass, Passes.TilingPass
+    Passes.NoOptPass, Passes.OMPPass, Passes.TilingPass, Passes.TilingPassOMP
 ]
 if not OPS_PASSES:
     raise Warning('You have to choose at least one pass')

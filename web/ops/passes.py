@@ -31,11 +31,16 @@ class TilingPass(Pass):
     #args = ['-backend=tiling', '-flattice', '-fmontego', '-rtails']
     args = ['-backend=wavefront']
 
+class TilingPassOMP(Pass):
+    '''Проход с Tiling бэкендом + OpenMP'''
+    args = ['-backend=wavefront_omp']
+
 
 class Passes(Enum):
     NoOptPass = 0
     OMPPass = 1
     TilingPass = 2
+    TilingPassOMP = 3
 
     @property
     def obj(self) -> Pass | None:
@@ -46,6 +51,8 @@ class Passes(Enum):
                 return OMPPass
             case Passes.TilingPass:
                 return TilingPass
+            case Passes.TilingPassOMP:
+                return TilingPassOMP
         return None
 
     def __str__(self) -> str:
@@ -60,6 +67,8 @@ class Passes(Enum):
                 return 'OpenMP backend'
             case Passes.TilingPass:
                 return 'Tiling backend'
+            case Passes.TilingPassOMP:
+                return 'Tiling backend + OMP'
         return super().__str__()
 
     @property
@@ -71,4 +80,6 @@ class Passes(Enum):
                 return 'OMP'
             case Passes.TilingPass:
                 return 'Tiling'
+            case Passes.TilingPassOMP:
+                return 'TilingOMP'
         return super().__str__()

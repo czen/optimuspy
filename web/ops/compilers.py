@@ -27,10 +27,17 @@ class SubmitFormCflags(Enum):
 
 
 class GCCCflags(GenericCflags):
-    O0 = '-O0 -march=native'
-    O1 = '-O1 -march=native'
-    O2 = '-O2 -march=native'
-    O3 = '-O3 -march=native'
+    O0 = '-fopenmp -O0 -march=native'
+    O1 = '-fopenmp -O1 -march=native'
+    O2 = '-fopenmp -O2 -march=native'
+    O3 = '-fopenmp -O3 -march=native'
+
+# TODO: refactor!
+class ClangCflags(GenericCflags):
+    O0 = '-fopenmp -L/usr/lib/llvm-14/lib -O0 -march=native'
+    O1 = '-fopenmp -L/usr/lib/llvm-14/lib -O1 -march=native'
+    O2 = '-fopenmp -L/usr/lib/llvm-14/lib -O2 -march=native'
+    O3 = '-fopenmp -L/usr/lib/llvm-14/lib -O3 -march=native'
 
 
 class MSVCCflags(GenericCflags):
@@ -65,6 +72,7 @@ class GCC(Compiler):
 
 
 class Clang(Compiler):
+    cflags = ClangCflags
     @property
     def name(self):
         return 'clang++-15'
