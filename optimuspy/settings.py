@@ -39,7 +39,7 @@ CSRF_TRUSTED_ORIGINS = [
     'http://192.168.0.115:8111',
     'http://optimuspy.ru',
     'http://testops',
-    'http://opsgroup.ru'
+    'http://opsgroup.ru',
     'http://optimuspy.docker.localhost'
 ]
 
